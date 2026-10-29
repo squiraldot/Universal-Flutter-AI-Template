@@ -18,7 +18,7 @@ class OpenAiCompatibleAiClient {
     required this.config,
     required this.tokenProvider,
     http.Client? httpClient,
-  })  : _httpClient = httpClient ?? http.Client(),
+  }) : _httpClient = httpClient ?? http.Client(),
         _ownsHttpClient = httpClient == null;
 
   final AiConfig config;
