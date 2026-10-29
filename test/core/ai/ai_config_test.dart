@@ -11,9 +11,7 @@ void main() {
 
       expect(
         config.chatCompletionsUri,
-        Uri.parse(
-          'https://example.com/v1/chat/completions',
-        ),
+        Uri.parse('https://example.com/v1/chat/completions'),
       );
     });
 
