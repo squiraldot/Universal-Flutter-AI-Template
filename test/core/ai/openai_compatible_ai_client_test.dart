@@ -58,10 +58,7 @@ void main() {
       httpClient: MockClient((_) async => http.Response('{}', 200)),
     );
 
-    await expectLater(
-      client.complete('Hello'),
-      throwsA(isA<AiException>()),
-    );
+    await expectLater(client.complete('Hello'), throwsA(isA<AiException>()));
     client.close();
   });
 
@@ -92,10 +89,7 @@ void main() {
       httpClient: MockClient((_) async => http.Response('not-json', 200)),
     );
 
-    await expectLater(
-      client.complete('Hello'),
-      throwsA(isA<AiException>()),
-    );
+    await expectLater(client.complete('Hello'), throwsA(isA<AiException>()));
     client.close();
   });
 }
