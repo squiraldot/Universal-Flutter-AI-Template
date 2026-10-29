@@ -9,7 +9,12 @@ void main() {
         model: 'demo-model',
       );
 
-      expect(config.chatCompletionsUri, Uri.parse('https://example.com/v1/chat/completions'));
+      expect(
+        config.chatCompletionsUri,
+        Uri.parse(
+          'https://example.com/v1/chat/completions',
+        ),
+      );
     });
 
     test('rejects non-HTTP schemes', () {
