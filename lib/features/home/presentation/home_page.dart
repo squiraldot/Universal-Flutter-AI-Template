@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../chat/domain/ai_chat_service.dart';
-import '../../chat/presentation/chat_page.dart';
-
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -17,37 +14,21 @@ class HomePage extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Icon(
-                Icons.auto_awesome,
+                Icons.layers_outlined,
                 size: 52,
                 color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(height: 16),
               Text(
-                'Your reusable Flutter AI app foundation is ready.',
+                'Your reusable Flutter app foundation is ready.',
                 style: Theme.of(context).textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
-              Text(
-                'Explore the chat starter, then connect a secure backend '
-                'when you are ready to enable live AI responses.',
+              const Text(
+                'Start building with reusable architecture, shared UI '
+                'components, testing, and automated build workflows.',
                 textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              FilledButton.icon(
-                key: const Key('open-ai-chat'),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => const ChatPage(
-                        chatService: UnavailableAiChatService(),
-                        showSetupNotice: true,
-                      ),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.chat_bubble_outline),
-                label: const Text('Open AI chat example'),
               ),
             ],
           ),
