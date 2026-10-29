@@ -19,7 +19,7 @@ class OpenAiCompatibleAiClient {
     required this.tokenProvider,
     http.Client? httpClient,
   }) : _httpClient = httpClient ?? http.Client(),
-        _ownsHttpClient = httpClient == null;
+       _ownsHttpClient = httpClient == null;
 
   final AiConfig config;
   final AiTokenProvider tokenProvider;
