@@ -44,6 +44,8 @@ jobs:
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock', 'pubspec.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pub-
+      - name: Diagnose formatter output
+        run: dart format --output=show test/core/ai/ai_config_test.dart
       - run: dart format --output=none --set-exit-if-changed lib test
       - run: flutter analyze
       - run: flutter test
