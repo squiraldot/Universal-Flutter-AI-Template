@@ -38,9 +38,9 @@ jobs:
         run: bash scripts/bootstrap.sh
       - uses: actions/cache@v4
         with:
-          path: |
-            ~/.pub-cache
-            .dart_tool
+          # Cache downloaded packages only. Never restore .dart_tool after pub get:
+          # its package_config.json must match the current pubspec and Dart SDK.
+          path: ~/.pub-cache
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock', 'pubspec.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pub-
