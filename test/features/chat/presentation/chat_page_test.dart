@@ -17,22 +17,28 @@ class _FakeChatService implements AiChatService {
 }
 
 void main() {
-  testWidgets('sends a message and displays the assistant reply', (tester) async {
-    final service = _FakeChatService((_) async => 'Hello from the assistant');
+  testWidgets(
+    'sends a message and displays the assistant reply',
+    (tester) async {
+      final service = _FakeChatService((_) async => 'Hello from the assistant');
 
-    await tester.pumpWidget(
-      MaterialApp(home: ChatPage(chatService: service)),
-    );
+      await tester.pumpWidget(
+        MaterialApp(home: ChatPage(chatService: service)),
+      );
 
-    await tester.enterText(find.byKey(const Key('chat-input')), '  Hi there  ');
-    await tester.tap(find.byKey(const Key('chat-send')));
-    await tester.pump();
-    await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const Key('chat-input')),
+        '  Hi there  ',
+      );
+      await tester.tap(find.byKey(const Key('chat-send')));
+      await tester.pump();
+      await tester.pumpAndSettle();
 
-    expect(service.lastMessage, 'Hi there');
-    expect(find.text('Hi there'), findsOneWidget);
-    expect(find.text('Hello from the assistant'), findsOneWidget);
-  });
+      expect(service.lastMessage, 'Hi there');
+      expect(find.text('Hi there'), findsOneWidget);
+      expect(find.text('Hello from the assistant'), findsOneWidget);
+    },
+  );
 
   testWidgets('shows a useful error when the service fails', (tester) async {
     final service = _FakeChatService(
