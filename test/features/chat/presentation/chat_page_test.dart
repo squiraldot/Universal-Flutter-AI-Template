@@ -36,7 +36,7 @@ void main() {
 
   testWidgets('shows a useful error when the service fails', (tester) async {
     final service = _FakeChatService(
-      (_) async => throw const AiChatUnavailableException(
+      (_) async => throw const AiChatException(
         'Connect an AI backend to enable chat.',
       ),
     );
