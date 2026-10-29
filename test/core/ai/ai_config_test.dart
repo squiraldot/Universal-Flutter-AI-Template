@@ -37,10 +37,7 @@ void main() {
 
     test('rejects blank model names', () {
       expect(
-        () => AiConfig(
-          baseUrl: Uri.parse('https://example.com/v1'),
-          model: '  ',
-        ),
+        () => AiConfig(baseUrl: Uri.parse('https://example.com/v1'), model: '  '),
         throwsArgumentError,
       );
     });
