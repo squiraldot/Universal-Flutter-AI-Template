@@ -16,14 +16,13 @@ typedef AiTokenProvider = Future<String?> Function();
 class OpenAiCompatibleAiClient {
   OpenAiCompatibleAiClient({
     required this.config,
-    required AiTokenProvider tokenProvider,
+    required this.tokenProvider,
     http.Client? httpClient,
-  })  : _tokenProvider = tokenProvider,
-        _httpClient = httpClient ?? http.Client(),
+  })  : _httpClient = httpClient ?? http.Client(),
         _ownsHttpClient = httpClient == null;
 
   final AiConfig config;
-  final AiTokenProvider _tokenProvider;
+  final AiTokenProvider tokenProvider;
   final http.Client _httpClient;
   final bool _ownsHttpClient;
 
@@ -36,7 +35,7 @@ class OpenAiCompatibleAiClient {
       throw ArgumentError.value(prompt, 'prompt', 'Prompt must not be empty.');
     }
 
-    final token = (await _tokenProvider())?.trim();
+    final token = (await tokenProvider())?.trim();
     if (token == null || token.isEmpty) {
       throw AiException.missingCredentials();
     }
