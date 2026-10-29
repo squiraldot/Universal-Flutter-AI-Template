@@ -27,9 +27,9 @@ void main() {
           jsonEncode({
             'choices': [
               {
-                'message': {'content': '  Hi there!  '}
-              }
-            ]
+                'message': {'content': '  Hi there!  '},
+              },
+            ],
           }),
           200,
         );
