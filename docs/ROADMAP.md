@@ -4,7 +4,7 @@
 
 This repository is a reusable starting point for many kinds of Flutter apps: education, productivity, business, social, utility, and AI-powered apps. The default app must remain neutral and lightweight.
 
-AI is an optional capability. AI clients, provider adapters, and sample chat screens belong in reusable or example modules; they must not define the default app experience.
+AI is an optional capability. The provider-independent AI client belongs in an optional reusable module; it must not define the default app experience. App-specific UI and workflows must come from the target app's approved specification.
 
 ## Milestones
 
@@ -32,8 +32,7 @@ AI is an optional capability. AI clients, provider adapters, and sample chat scr
 ### 4. Optional capability modules
 - [ ] Keep AI integration behind a provider-independent contract
 - [ ] Keep provider credentials on a trusted backend
-- [ ] Keep chat as an optional example feature, not the default app flow
-- [ ] Add other integrations only as independent, documented modules
+- [ ] Add integrations only as independent, documented modules when a real app requires them
 
 ### 5. Template usability and release readiness
 - [ ] Document the “new app from template” workflow end-to-end
@@ -46,4 +45,5 @@ AI is an optional capability. AI clients, provider adapters, and sample chat scr
 - Prefer a small, tested core over preinstalling every possible package.
 - Add dependencies only when a concrete reusable need justifies them.
 - Every optional module must be removable without breaking the default starter.
+- Do not invent app features from the template name or AI-generated assumptions; follow the filled app specification.
 - Do not merge a milestone until the latest CI and APK workflows pass.
