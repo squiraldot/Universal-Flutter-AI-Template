@@ -6,11 +6,9 @@ typedef AiStreamHandler = Stream<String> Function(String prompt);
 
 /// Lightweight deterministic fake for tests; no network or provider is used.
 class MockAiClient implements AiClient {
-  MockAiClient({
-    AiCompletionHandler? onComplete,
-    AiStreamHandler? onStream,
-  }) : _onComplete = onComplete ?? _defaultComplete,
-       _onStream = onStream ?? _defaultStream;
+  MockAiClient({AiCompletionHandler? onComplete, AiStreamHandler? onStream})
+    : _onComplete = onComplete ?? _defaultComplete,
+      _onStream = onStream ?? _defaultStream;
 
   final AiCompletionHandler _onComplete;
   final AiStreamHandler _onStream;
