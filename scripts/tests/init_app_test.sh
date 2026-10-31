@@ -9,6 +9,7 @@ mkdir -p "$FIXTURE/scripts" "$FIXTURE/docs" "$FIXTURE/lib/features/home/presenta
 mkdir -p "$FIXTURE/android/app/src/main/kotlin/com/example/universal_app"
 
 cp "$ROOT_DIR/scripts/init_app.sh" "$FIXTURE/scripts/init_app.sh"
+bash -n "$FIXTURE/scripts/init_app.sh"
 cat > "$FIXTURE/pubspec.yaml" <<'EOF'
 name: universal_app
 EOF
@@ -46,6 +47,9 @@ EOF
 # Invalid identifiers must fail before changing any file.
 if bash "$FIXTURE/scripts/init_app.sh" "Lifebit" "Not-valid" "com.example.lifebit" >/dev/null 2>&1; then
   echo "Expected invalid Dart package name to fail." >&2; exit 1
+fi
+if bash "$FIXTURE/scripts/init_app.sh" "Lifebit" lifebit "com.Invalid.id" >/dev/null 2>&1; then
+  echo "Expected invalid Android application ID to fail." >&2; exit 1
 fi
 
 # Dry-run must describe changes while leaving the fixture untouched.
