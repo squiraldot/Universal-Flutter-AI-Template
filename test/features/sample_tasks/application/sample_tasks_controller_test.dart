@@ -62,7 +62,10 @@ void main() {
     );
     await container.read(sampleTasksProvider.notifier).reload();
 
-    expect(container.read(sampleTasksProvider).requireValue.single.id, 'recovered');
+    expect(
+      container.read(sampleTasksProvider).requireValue.single.id,
+      'recovered',
+    );
   });
 }
 
