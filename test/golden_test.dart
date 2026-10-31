@@ -23,6 +23,11 @@ void main() {
     image.dispose();
 
     final goldenFile = File('test/goldens/solid_red.png');
+    addTearDown(() async {
+      if (await goldenFile.exists()) {
+        await goldenFile.delete();
+      }
+    });
     await goldenFile.parent.create(recursive: true);
     await goldenFile.writeAsBytes(png!.buffer.asUint8List());
 
