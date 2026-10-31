@@ -7,13 +7,30 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Universal App')),
-      body: const Center(
+      body: Center(
         child: Padding(
-          padding: EdgeInsets.all(24),
-          child: Text(
-            'Template ready. Define your app in docs/APP_SPEC.md, '
-            'then ask your AI agent to implement one feature at a time.',
-            textAlign: TextAlign.center,
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(
+                Icons.layers_outlined,
+                size: 52,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Your reusable Flutter app foundation is ready.',
+                style: Theme.of(context).textTheme.titleLarge,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Start building with reusable architecture, shared UI '
+                'components, testing, and automated build workflows.',
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
       ),

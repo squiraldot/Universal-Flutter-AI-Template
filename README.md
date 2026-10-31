@@ -1,6 +1,6 @@
 # Universal Flutter AI App Template
 
-Reusable repository foundation for AI-assisted Flutter Android apps.
+A reusable foundation for building different kinds of Flutter apps, with optional AI integration modules.
 
 ## What this template provides
 - AI agent instructions and app-specific specifications
@@ -8,6 +8,9 @@ Reusable repository foundation for AI-assisted Flutter Android apps.
 - Pinned Flutter SDK Git submodule
 - GitHub Actions for analysis/tests and debug APK artifacts
 - Security, testing, architecture and release guidance
+- Optional AI client foundation that can be reused when a project needs AI
+
+The default starter screen stays app-agnostic. Example features such as AI chat are optional modules, not requirements for every app.
 
 No folder structure can guarantee zero issues for every app. This template reduces avoidable problems; app-specific plugins, backend, permissions and release configuration still require validation.
 
