@@ -8,9 +8,9 @@ A reusable foundation for building different kinds of Flutter apps, with optiona
 - Pinned Flutter SDK Git submodule
 - GitHub Actions for analysis/tests and debug APK artifacts
 - Security, testing, architecture and release guidance
-- Optional AI client foundation that can be reused when a project needs AI
+- Optional provider-independent AI client foundation for apps that need AI
 
-The default starter screen stays app-agnostic. Example features such as AI chat are optional modules, not requirements for every app.
+The default starter screen stays app-agnostic. This repository is a template, not a prebuilt chat application: app-specific screens and features must be added only from the target app's approved specification.
 
 No folder structure can guarantee zero issues for every app. This template reduces avoidable problems; app-specific plugins, backend, permissions and release configuration still require validation.
 
