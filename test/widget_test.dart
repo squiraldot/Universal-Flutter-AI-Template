@@ -24,6 +24,5 @@ void main() {
       find.text('Your reusable Flutter app foundation is ready.'),
       findsOneWidget,
     );
-    expect(find.text('Open sample tasks'), findsOneWidget);
   });
 }

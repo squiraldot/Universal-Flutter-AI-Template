@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../core/routing/app_routes.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../l10n/generated/app_localizations.dart';
 
@@ -33,12 +31,6 @@ class HomePage extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(l10n.homeDescription, textAlign: TextAlign.center),
-              const SizedBox(height: AppSpacing.lg),
-              FilledButton.icon(
-                onPressed: () => context.go(AppRoutes.sampleTasks),
-                icon: const Icon(Icons.checklist),
-                label: Text(l10n.openSampleTasks),
-              ),
             ],
           ),
         ),

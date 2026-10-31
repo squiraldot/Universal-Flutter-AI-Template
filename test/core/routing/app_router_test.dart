@@ -4,13 +4,12 @@ import 'package:universal_app/app.dart';
 import 'package:universal_app/core/config/app_environment.dart';
 import 'package:universal_app/core/config/app_environment_provider.dart';
 import 'package:universal_app/core/routing/app_router.dart';
+import 'package:universal_app/core/routing/app_routes.dart';
 import 'package:universal_app/features/sample_tasks/presentation/sample_tasks_page.dart';
 
 void main() {
-  testWidgets('home navigation opens the sample feature', (tester) async {
-    await tester.pumpWidget(_testApp());
-
-    await tester.tap(find.text('Open sample tasks'));
+  testWidgets('sample feature is addressable through its route', (tester) async {
+    await tester.pumpWidget(_testApp(initialLocation: AppRoutes.sampleTasks));
     await tester.pumpAndSettle();
 
     expect(find.byType(SampleTasksPage), findsOneWidget);
@@ -20,7 +19,7 @@ void main() {
   testWidgets('unknown locations show a safe fallback and return home', (
     tester,
   ) async {
-    await tester.pumpWidget(_testApp(startAtMissingRoute: true));
+    await tester.pumpWidget(_testApp(initialLocation: '/missing-page'));
 
     expect(find.text('Page not found'), findsOneWidget);
     await tester.tap(find.text('Go home'));
@@ -33,16 +32,15 @@ void main() {
   });
 }
 
-Widget _testApp({bool startAtMissingRoute = false}) {
+Widget _testApp({required String initialLocation}) {
   return ProviderScope(
     overrides: [
       appEnvironmentProvider.overrideWithValue(
         AppEnvironment.fromValues(name: 'development'),
       ),
-      if (startAtMissingRoute)
-        appRouterProvider.overrideWith(
-          (ref) => createAppRouter(initialLocation: '/missing-page'),
-        ),
+      appRouterProvider.overrideWith(
+        (ref) => createAppRouter(initialLocation: initialLocation),
+      ),
     ],
     child: const UniversalApp(),
   );
