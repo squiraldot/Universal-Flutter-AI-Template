@@ -26,13 +26,6 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - GitHub issue templates for bug reports and feature requests, plus a reusable
   pull-request verification checklist and feature-specification template.
 
-### Security
-- Gitleaks workflow scans the full Git history on pushes and pull requests to
-  `main`, with manual dispatch support.
-- Signed release credentials are read from GitHub Actions secrets and the
-  temporary keystore is removed from the runner after signing.
-
-### Added
 - GitHub Actions run Flutter formatting, analysis, tests, coverage checks, and
   debug APK builds with downloadable artifacts.
 - Manual signed Android App Bundle workflow builds from `main`, verifies the
@@ -43,3 +36,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   grouped ecosystems; zero-open-PR limits currently prevent version-update PRs.
 - Flutter SDK and Android build tooling are pinned/configured for reproducible
   CI and release workflows.
+
+### Security
+- Gitleaks workflow scans the full Git history on pushes and pull requests to
+  `main`, with manual dispatch support.
+- Signed release credentials are read from GitHub Actions secrets and the
+  temporary keystore is removed from the runner after signing.
