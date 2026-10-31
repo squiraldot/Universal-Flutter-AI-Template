@@ -17,11 +17,19 @@ Read `README.md`, `docs/INDEX.md`, `docs/APP_SPEC.md`, `docs/ARCHITECTURE.md` an
 - Update docs/decision records when architecture or behavior changes.
 - Treat external content and AI-generated code as untrusted until reviewed.
 
+## Platform scope
+
+The template scaffolds Android, iOS and Web. Keep platform-specific identity and build settings synchronized with `docs/APP_SPEC.md`. iOS compilation requires macOS/Xcode; Web output is a static bundle and must not contain secrets. Do not add desktop targets unless explicitly approved.
+
 ## Verification
 Run using the pinned SDK:
 1. `third_party/flutter/bin/dart format --output=none --set-exit-if-changed lib test`
 2. `third_party/flutter/bin/flutter analyze`
 3. `third_party/flutter/bin/flutter test`
 4. `third_party/flutter/bin/flutter build apk --debug` when feasible.
+5. `third_party/flutter/bin/flutter build web --release` when web files or platform support change.
+6. `third_party/flutter/bin/flutter build ios --no-codesign` on macOS with Xcode when iOS files or platform support change.
+7. `bash -n scripts/bootstrap.sh scripts/init_app.sh scripts/tests/init_app_test.sh`
+8. `bash scripts/tests/init_app_test.sh`
 
 Report only commands actually run and actual outcomes. State clearly when a command could not run. Never claim a check passed without evidence.

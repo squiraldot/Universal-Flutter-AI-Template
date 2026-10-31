@@ -2,15 +2,38 @@
 
 Flutter is a Git submodule at `third_party/flutter`, pinned to a specific stable commit. The superproject gitlink records the exact SDK commit. The `.gitmodules` entry enables shallow clones to reduce initial checkout time. Upgrade deliberately and test the toolchain as a compatible set.
 
+## Platform prerequisites
+
+| Platform | Build host | Tooling | CI output |
+| --- | --- | --- | --- |
+| Android | Linux, macOS or Windows | Flutter, JDK 17, Android SDK | Debug APK; manual signed AAB release |
+| iOS | macOS only | Flutter, Xcode and iOS SDK | Unsigned iOS build validation |
+| Web | Linux, macOS or Windows | Flutter and a supported browser for local testing | Production bundle in `build/web` |
+
+The bootstrap script uses `flutter create --platforms=android,ios,web` in a temporary directory and copies only platform folders that do not already exist. It does not overwrite the app's Dart source or pubspec.
+
 ## Bootstrap
-1. Install JDK and Android SDK prerequisites.
-2. Run `git submodule update --init --recursive`.
+
+1. Install Flutter and initialize its submodule: `git submodule update --init --recursive`.
+2. Install JDK and Android SDK for Android builds; install Xcode on macOS for iOS builds.
 3. Run `bash scripts/bootstrap.sh`.
-4. Review and commit generated Android files and `pubspec.lock`.
+4. Review generated Android, iOS and Web files and commit them with `pubspec.lock`.
+
+## Build commands
+
+```bash
+third_party/flutter/bin/flutter build apk --debug
+# Run on macOS with Xcode installed:
+third_party/flutter/bin/flutter build ios --no-codesign
+third_party/flutter/bin/flutter build web --release
+```
+
+The Web output is written to `build/web`. Configure the hosting provider to serve this directory and route unknown paths to `index.html` when using path-based client-side routing.
 
 ## CI
-- `flutter-ci.yml`: formatting, analysis, tests and debug APK artifact.
-- `initialize-new-app.yml`: generate a new app identity and downloadable source/APK artifacts.
+
+- `flutter-ci.yml`: formatting, analysis, tests, coverage, Android debug APK and Web release bundle on Ubuntu; unsigned iOS build on macOS.
+- `initialize-new-app.yml`: generate all three platform scaffolds, apply app identity and upload initialized source, Android APK and Web bundle artifacts.
 - `initializer-script-tests.yml`: shell syntax and initializer regression tests.
 - `secret-scan.yml`: Gitleaks scans the complete Git history on pushes and pull requests.
 - `release-signed-aab.yml`: manually builds, signs and uploads a release Android App Bundle from `main`.
@@ -40,8 +63,16 @@ Copy the base64 output into `ANDROID_KEYSTORE_BASE64`; add the other values as s
 
 In **Actions → Manual Signed AAB Release → Run workflow**, select `main`, provide the app version name and Android version code, then download the signed AAB from the run's artifact. Keep the same upload key safe for future updates; losing it can block updates unless Play App Signing recovery is available.
 
+## iOS signing and distribution
+
+The CI job runs `flutter build ios --no-codesign` on macOS to validate compilation without credentials. Device installation, simulator testing, archive signing, provisioning profiles, certificates, TestFlight and App Store delivery require app-specific Xcode configuration and Apple developer credentials. Those are intentionally not stored or configured in this generic template.
+
+## Web deployment
+
+CI uploads the static production output from `build/web`; it does not deploy it. Choose a host, configure SPA route fallback to `index.html` if needed, set cache headers and connect the app's domain through that provider. Web is intended for app-style interfaces rather than SEO-first content publishing.
+
 ## Signing and security
 
-Never commit keystores or `key.properties`. Use GitHub Secrets for signing credentials. Secrets embedded in an APK/AAB can usually be extracted; privileged operations belong on a trusted backend. Flutter `--dart-define` values are public configuration, not secret storage.
+Never commit keystores or `key.properties`. Use GitHub Secrets for signing credentials. Secrets embedded in an APK, iOS app or Web bundle can be extracted; privileged operations belong on a trusted backend. Flutter `--dart-define` values are public configuration, not secret storage.
 
-Debug APKs are for testing, not production. Review the version/build number, release notes, permissions, privacy disclosures and signed artifact before distribution.
+Debug APKs are for testing, not production. Review version/build numbers, release notes, permissions, privacy disclosures, browser compatibility and signed artifacts before distribution.

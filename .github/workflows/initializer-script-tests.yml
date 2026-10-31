@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Check shell syntax
-        run: bash -n scripts/init_app.sh scripts/tests/init_app_test.sh
+        run: bash -n scripts/bootstrap.sh scripts/init_app.sh scripts/tests/init_app_test.sh
 
       - name: Run initializer safety tests
         run: bash scripts/tests/init_app_test.sh

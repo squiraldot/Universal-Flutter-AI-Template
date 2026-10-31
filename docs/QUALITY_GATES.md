@@ -10,13 +10,17 @@
 
 ## When relevant
 - Android build passes after plugin, Gradle, manifest, permission or native changes.
+- iOS unsigned build passes on macOS after plugin, Xcode project, plist, permission or native changes.
+- Web release build passes after browser, web manifest, HTML, plugin or web-specific changes.
 - Persistence migrations include data-loss and rollback review.
 - Loading, empty, error, offline and permission-denied states are covered.
 - UI checked for small screens, text scaling, dark theme and accessibility.
+- Web UI checked for responsive layouts, browser console errors, keyboard access and supported browser behavior.
 - Critical journeys have integration tests where practical.
 
 ## Release
 - Version/build number and release notes reviewed.
-- Signing uses protected secrets.
+- Android/iOS signing uses protected credentials and platform-specific release configuration.
+- Web hosting, SPA fallback and cache behavior reviewed.
 - Permissions/privacy disclosures reviewed.
-- Release artifact verified.
+- Release artifacts verified.

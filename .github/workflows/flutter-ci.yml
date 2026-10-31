@@ -15,8 +15,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quality-and-build:
-    name: Format, Analyze, Test & Build APK
+  android-web-quality:
+    name: Format, Analyze, Test, Android & Web
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -45,7 +45,7 @@ jobs:
       - name: Install Android SDK packages
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
-      - name: Bootstrap Android scaffold and resolve dependencies
+      - name: Bootstrap Android, iOS and Web scaffolds
         run: bash scripts/bootstrap.sh
 
       - name: Cache Gradle dependencies
@@ -74,9 +74,40 @@ jobs:
       - name: Build debug APK
         run: flutter build apk --debug
 
+      - name: Build Web release bundle
+        run: flutter build web --release
+
       - name: Upload debug APK
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: universal-flutter-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
           if-no-files-found: error
+
+      - name: Upload Web release bundle
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: universal-flutter-web-build
+          path: build/web/
+          if-no-files-found: error
+
+  ios-build:
+    name: Build iOS (unsigned)
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          flutter-version: '3.47.8'
+          channel: stable
+          cache: true
+
+      - name: Bootstrap platform scaffolds
+        run: bash scripts/bootstrap.sh
+
+      - name: Build iOS without code signing
+        run: flutter build ios --no-codesign

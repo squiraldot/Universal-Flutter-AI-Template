@@ -4,9 +4,10 @@
 - App name:
 - Dart package name:
 - Android application ID:
+- iOS bundle identifier:
 - One-sentence summary:
 - Target users:
-- Supported platforms:
+- Supported platforms: Android, iOS, Web (remove any platform not targeted by this app)
 - Minimum Android version and rationale:
 
 ## Problem and goals
@@ -45,6 +46,7 @@ Describe the critical flows from launch to success.
 - Privacy/security:
 - Performance/reliability:
 - Supported devices:
+- Browser support and responsive breakpoints (for Web):
 
 ## Out of scope
 List features AI must not add without approval.

@@ -15,8 +15,12 @@ on:
         description: Reverse-domain Android application ID
         required: true
         type: string
+      ios_bundle_id:
+        description: Reverse-domain iOS bundle identifier (defaults to Android ID)
+        required: false
+        type: string
       dry_run:
-        description: Preview changes without modifying the project or building an APK
+        description: Preview changes without modifying the project or building artifacts
         required: false
         default: false
         type: boolean
@@ -31,7 +35,7 @@ concurrency:
 jobs:
   initialize:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - name: Checkout template
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -57,7 +61,7 @@ jobs:
       - name: Install Android SDK packages
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
-      - name: Generate Android scaffold
+      - name: Generate Android, iOS and Web scaffolds
         run: bash scripts/bootstrap.sh
 
       - name: Cache Gradle dependencies
@@ -70,8 +74,11 @@ jobs:
           APP_NAME: ${{ inputs.app_name }}
           DART_PACKAGE_NAME: ${{ inputs.dart_package_name }}
           ANDROID_APPLICATION_ID: ${{ inputs.android_application_id }}
+          IOS_BUNDLE_ID: ${{ inputs.ios_bundle_id }}
         run: |
-          bash scripts/init_app.sh --dry-run "$APP_NAME" "$DART_PACKAGE_NAME" "$ANDROID_APPLICATION_ID" | tee initialization-plan.txt
+          args=()
+          if [[ -n "$IOS_BUNDLE_ID" ]]; then args+=(--ios-bundle-id "$IOS_BUNDLE_ID"); fi
+          bash scripts/init_app.sh --dry-run "${args[@]}" "$APP_NAME" "$DART_PACKAGE_NAME" "$ANDROID_APPLICATION_ID" | tee initialization-plan.txt
 
       - name: Apply app identity
         if: ${{ !inputs.dry_run }}
@@ -79,7 +86,11 @@ jobs:
           APP_NAME: ${{ inputs.app_name }}
           DART_PACKAGE_NAME: ${{ inputs.dart_package_name }}
           ANDROID_APPLICATION_ID: ${{ inputs.android_application_id }}
-        run: bash scripts/init_app.sh "$APP_NAME" "$DART_PACKAGE_NAME" "$ANDROID_APPLICATION_ID"
+          IOS_BUNDLE_ID: ${{ inputs.ios_bundle_id }}
+        run: |
+          args=()
+          if [[ -n "$IOS_BUNDLE_ID" ]]; then args+=(--ios-bundle-id "$IOS_BUNDLE_ID"); fi
+          bash scripts/init_app.sh "${args[@]}" "$APP_NAME" "$DART_PACKAGE_NAME" "$ANDROID_APPLICATION_ID"
 
       - name: Run initializer safety tests
         if: ${{ !inputs.dry_run }}
@@ -104,6 +115,10 @@ jobs:
       - name: Build debug APK
         if: ${{ !inputs.dry_run }}
         run: flutter build apk --debug
+
+      - name: Build Web release bundle
+        if: ${{ !inputs.dry_run }}
+        run: flutter build web --release
 
       - name: Package initialized source
         id: package-source
@@ -137,5 +152,14 @@ jobs:
         with:
           name: initialized-app-debug-apk-${{ github.run_number }}
           path: build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload Web release bundle
+        if: ${{ !inputs.dry_run }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: initialized-app-web-build-${{ github.run_number }}
+          path: build/web/
           if-no-files-found: error
           retention-days: 14
