@@ -4,7 +4,7 @@
 - Provider/controller tests: repository overrides, async state, state transitions and retry behavior.
 - Widget tests: UI states, interactions, semantics, localization and accessibility.
 - Golden tests: stable visual snapshots for important starter UI; `test/golden_test.dart` demonstrates a deterministic pixel comparison.
-- Integration tests: critical journeys, plugin behavior and real app boundaries; `integration_test/app_smoke_test.dart` verifies app startup and the localized home screen on Chrome.
+- Integration tests: critical journeys, plugin behavior and real app boundaries; `integration_test/app_smoke_test.dart` verifies app startup and the localized home screen on Chrome through the `flutter drive` + ChromeDriver flow.
 - Shell tests: initializer safety and coverage-threshold behavior, including below-threshold and invalid-threshold cases.
 
 Test observable outcomes, not private implementation details. Prefer real implementations or fakes; mock external boundaries only when needed. Cover loading, empty, error, retry, offline behavior and denied permissions where relevant. Keep tests independent and descriptive.
@@ -26,7 +26,8 @@ third_party/flutter/bin/dart format --output=none --set-exit-if-changed lib test
 third_party/flutter/bin/flutter analyze
 third_party/flutter/bin/flutter test --coverage
 bash scripts/check_coverage.sh
-third_party/flutter/bin/flutter test integration_test -d chrome
+# Web integration tests require a matching ChromeDriver on PATH and a running ChromeDriver service.
+third_party/flutter/bin/flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_smoke_test.dart -d web-server --browser-name=chrome --web-port=7357
 third_party/flutter/bin/flutter build apk --debug --dart-define-from-file=config/development.json
 third_party/flutter/bin/flutter build web --release --dart-define-from-file=config/production.json
 # macOS + Xcode only:
