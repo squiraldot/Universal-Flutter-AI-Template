@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../application/sample_tasks_controller.dart';
+import '../domain/sample_task.dart';
 
 class SampleTasksPage extends ConsumerWidget {
   const SampleTasksPage({super.key});
@@ -49,7 +50,7 @@ class SampleTasksPage extends ConsumerWidget {
               for (final task in items)
                 CheckboxListTile(
                   value: task.isCompleted,
-                  title: Text(_localizedTaskTitle(l10n, task.id)),
+                  title: Text(_localizedTaskTitle(l10n, task)),
                   onChanged: (_) => ref
                       .read(sampleTasksProvider.notifier)
                       .toggleCompleted(task.id),
@@ -62,11 +63,11 @@ class SampleTasksPage extends ConsumerWidget {
     );
   }
 
-  String _localizedTaskTitle(AppLocalizations l10n, String taskId) {
-    return switch (taskId) {
+  String _localizedTaskTitle(AppLocalizations l10n, SampleTask task) {
+    return switch (task.id) {
       'architecture' => l10n.taskArchitecture,
       'feature' => l10n.taskFeature,
-      _ => taskId,
+      _ => task.title,
     };
   }
 }
