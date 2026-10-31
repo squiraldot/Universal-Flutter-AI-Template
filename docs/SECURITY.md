@@ -2,6 +2,7 @@
 
 - Never commit API keys, OAuth secrets, signing keystores, passwords, service-account JSON or production user data.
 - Use GitHub Actions secrets for CI credentials. Secrets embedded in an APK can usually be extracted; privileged operations belong on a trusted backend.
+- Flutter compile-time defines such as `APP_ENV` and `API_BASE_URL` are public configuration, not secret storage; values shipped in an APK can be inspected.
 - Request Android permissions only when necessary and explain their user value.
 - Minimize collection and retention of personal data.
 - Validate external input and API responses.
