@@ -45,7 +45,7 @@ class OpenAiCompatibleAiClient implements AiClient {
       cancellation: cancellation,
       streaming: false,
     );
-    _throwForStatus(result.response.statusCode);
+    _throwForStatus(result);
 
     final body = await _readBody(result.response, result.cancellation);
     try {
@@ -182,8 +182,8 @@ class OpenAiCompatibleAiClient implements AiClient {
         final retryableStatus =
             response.statusCode == 429 || response.statusCode >= 500;
         if (retryableStatus && attempt < config.maxRetries) {
-          attemptCancellation.cancel();
           await response.stream.listen(null).cancel();
+          attemptCancellation.cancel();
           await _waitBeforeRetry(attempt, cancellation);
           continue;
         }
@@ -328,8 +328,10 @@ class OpenAiCompatibleAiClient implements AiClient {
     return content;
   }
 
-  void _throwForStatus(int statusCode) {
+  void _throwForStatus(_AiHttpResponse result) {
+    final statusCode = result.response.statusCode;
     if (statusCode >= 200 && statusCode < 300) return;
+    result.cancellation.cancel();
     if (statusCode == 401 || statusCode == 403) {
       throw AiException(
         'The AI service rejected the supplied credentials.',
