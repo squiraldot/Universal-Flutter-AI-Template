@@ -29,10 +29,10 @@ It is intentionally app-agnostic. It does not prescribe a chat app, a particular
 ## What this template provides
 
 - AI agent instructions and app-specific specifications
-- Feature-first Dart structure with optional complexity only when needed
+- Feature-first Flutter starter structure with a replaceable, app-agnostic home screen
 - Pinned Flutter SDK Git submodule with shallow-clone configuration
-- GitHub Actions for analysis/tests, debug APK artifacts, secret scanning and manual signed-AAB releases
-- Weekly Dependabot updates for GitHub Actions and Dart/Flutter dependencies
+- GitHub Actions for CI, debug APK artifacts, new-app initialization, secret scanning and manual signed-AAB releases
+- Dependabot configuration for weekly GitHub Actions and Pub dependency updates; automatic update pull requests are disabled by the current zero-open-PR limits
 - Security, testing, architecture and release guidance
 - Optional provider-independent AI client foundation for apps that need AI
 

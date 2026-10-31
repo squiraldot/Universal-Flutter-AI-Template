@@ -15,7 +15,8 @@ Flutter is a Git submodule at `third_party/flutter`, pinned to a specific stable
 - `secret-scan.yml`: Gitleaks scans the complete Git history on pushes and pull requests.
 - `release-signed-aab.yml`: manually builds, signs and uploads a release Android App Bundle from `main`.
 - Flutter SDK and Gradle dependency caches are enabled in Android build workflows.
-- Third-party GitHub Actions are pinned to full commit SHAs; Dependabot checks GitHub Actions and Pub dependencies weekly.
+- Third-party GitHub Actions are pinned to full commit SHAs.
+- Dependabot has weekly schedules for GitHub Actions and Pub dependencies, but the configured zero-open-PR limits prevent it from opening version-update pull requests.
 
 ## Manual signed AAB release
 
@@ -41,6 +42,6 @@ In **Actions → Manual Signed AAB Release → Run workflow**, select `main`, pr
 
 ## Signing and security
 
-Never commit keystores or `key.properties`. Use GitHub Secrets for signing credentials. Secrets embedded in an APK/AAB can usually be extracted; privileged operations belong on a trusted backend. Treat Flutter `--dart-define` values as public configuration, not secret storage.
+Never commit keystores or `key.properties`. Use GitHub Secrets for signing credentials. Secrets embedded in an APK/AAB can usually be extracted; privileged operations belong on a trusted backend. Flutter `--dart-define` values are public configuration, not secret storage.
 
 Debug APKs are for testing, not production. Review the version/build number, release notes, permissions, privacy disclosures and signed artifact before distribution.
