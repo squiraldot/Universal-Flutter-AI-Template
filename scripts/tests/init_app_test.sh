@@ -16,7 +16,6 @@ EOF
 cat > "$FIXTURE/docs/APP_SPEC.md" <<'EOF'
 ## Identity
 - App name:
-- Dart package name:
 - Android application ID:
 - One-sentence summary: Preserve this placeholder.
 EOF
