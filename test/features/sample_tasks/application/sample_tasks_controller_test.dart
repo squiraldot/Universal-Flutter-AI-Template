@@ -50,9 +50,7 @@ void main() {
   test('reload recovers after a repository failure', () async {
     final repository = _FailOnceRepository();
     final container = ProviderContainer(
-      overrides: [
-        sampleTasksRepositoryProvider.overrideWithValue(repository),
-      ],
+      overrides: [sampleTasksRepositoryProvider.overrideWithValue(repository)],
     );
     addTearDown(container.dispose);
 

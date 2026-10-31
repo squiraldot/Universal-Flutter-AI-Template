@@ -8,16 +8,15 @@ import 'package:universal_app/core/routing/app_routes.dart';
 import 'package:universal_app/features/sample_tasks/presentation/sample_tasks_page.dart';
 
 void main() {
-  testWidgets(
-    'sample feature is addressable through its route',
-    (tester) async {
-      await tester.pumpWidget(_testApp(initialLocation: AppRoutes.sampleTasks));
-      await tester.pumpAndSettle();
+  testWidgets('sample feature is addressable through its route', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_testApp(initialLocation: AppRoutes.sampleTasks));
+    await tester.pumpAndSettle();
 
-      expect(find.byType(SampleTasksPage), findsOneWidget);
-      expect(find.text('Sample tasks'), findsOneWidget);
-    },
-  );
+    expect(find.byType(SampleTasksPage), findsOneWidget);
+    expect(find.text('Sample tasks'), findsOneWidget);
+  });
 
   testWidgets('unknown locations show a safe fallback and return home', (
     tester,

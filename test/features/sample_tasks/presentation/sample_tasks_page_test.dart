@@ -56,9 +56,7 @@ void main() {
 
 Widget _testApp(SampleTasksRepository repository) {
   return ProviderScope(
-    overrides: [
-      sampleTasksRepositoryProvider.overrideWithValue(repository),
-    ],
+    overrides: [sampleTasksRepositoryProvider.overrideWithValue(repository)],
     child: MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,

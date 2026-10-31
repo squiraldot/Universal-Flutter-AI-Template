@@ -18,9 +18,7 @@ class SampleTasksPage extends ConsumerWidget {
       appBar: AppBar(title: Text(l10n.sampleTasksTitle)),
       body: tasks.when(
         loading: () => Center(
-          child: CircularProgressIndicator(
-            semanticsLabel: l10n.loadingTasks,
-          ),
+          child: CircularProgressIndicator(semanticsLabel: l10n.loadingTasks),
         ),
         error: (error, stackTrace) => Center(
           child: Padding(

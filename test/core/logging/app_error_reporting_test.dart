@@ -14,9 +14,7 @@ void main() {
       final records = <_LogRecord>[];
       final logger = DeveloperAppLogger(
         sink: (message, {required level, required name, error, stackTrace}) {
-          records.add(
-            _LogRecord(scope: name, message: message, error: error),
-          );
+          records.add(_LogRecord(scope: name, message: message, error: error));
         },
       );
       addTearDown(() {
