@@ -85,8 +85,8 @@ jobs:
             echo "Could not determine the installed Google Chrome version." >&2
             google-chrome --version >&2 || true
             exit 1
-          echo "Installing ChromeDriver for Chrome $chrome_version."
           fi
+          echo "Installing ChromeDriver for Chrome $chrome_version."
           npx --yes @puppeteer/browsers install "chromedriver@$chrome_version" --path "$RUNNER_TEMP/chromedriver"
           chromedriver_path="$(find "$RUNNER_TEMP/chromedriver" -type f -name chromedriver -perm -u+x | head -n 1)"
           if [[ -z "$chromedriver_path" ]]; then
