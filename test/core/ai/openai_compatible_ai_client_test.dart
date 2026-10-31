@@ -299,4 +299,29 @@ void main() {
     );
     client.close();
   });
+  test('cancelling a stream subscription aborts its operation', () async {
+    final cancellation = AiCancellationToken();
+    final client = OpenAiCompatibleAiClient(
+      config: config(),
+      tokenProvider: () async => 'token',
+      httpClient: MockClient(
+        (_) async => http.Response(
+          'data: {"choices":[{"delta":{"content":"first"}}]}\\n\\n'
+          'data: {"choices":[{"delta":{"content":"second"}}]}\\n\\n',
+          200,
+        ),
+      ),
+    );
+
+    expect(
+      await client.stream(
+        'Hello',
+        cancellationToken: cancellation,
+      ).first,
+      'first',
+    );
+    expect(cancellation.isCancelled, isTrue);
+    client.close();
+  });
+
 }
