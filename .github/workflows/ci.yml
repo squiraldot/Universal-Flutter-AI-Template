@@ -38,6 +38,8 @@ jobs:
         run: bash scripts/bootstrap.sh
       - name: Test app initializer
         run: bash scripts/tests/init_app_test.sh
+      - name: Test app initializer
+        run: bash scripts/tests/init_app_test.sh
       - uses: actions/cache@v4
         with:
           # Cache downloaded packages only. Never restore .dart_tool after pub get:
