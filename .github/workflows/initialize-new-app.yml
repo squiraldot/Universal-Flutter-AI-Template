@@ -101,15 +101,17 @@ jobs:
         run: flutter build apk --debug
 
       - name: Package initialized source
+        id: package-source
         if: ${{ !inputs.dry_run }}
         run: |
-          tar -czf initialized-app-source.tar.gz \
-            --exclude=.git \
-            --exclude=.dart_tool \
-            --exclude=build \
-            --exclude=third_party/flutter \
-            --exclude=initialized-app-source.tar.gz \
-            .
+          archive_path="$RUNNER_TEMP/initialized-app-source.tar.gz"
+          tar -czf "$archive_path" \\
+            --exclude=.git \\
+            --exclude=.dart_tool \\
+            --exclude=build \\
+            --exclude=third_party/flutter \\
+            -C "$GITHUB_WORKSPACE" .
+          echo "archive_path=$archive_path" >> "$GITHUB_OUTPUT"
 
       - name: Upload initialization preview
         if: ${{ inputs.dry_run }}
@@ -125,7 +127,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: initialized-app-source-${{ github.run_number }}
-          path: initialized-app-source.tar.gz
+          path: ${{ steps.package-source.outputs.archive_path }}
           if-no-files-found: error
           retention-days: 14
 
