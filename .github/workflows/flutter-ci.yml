@@ -80,7 +80,13 @@ jobs:
 
       - name: Install matching ChromeDriver
         run: |
-          chrome_version="$(google-chrome --version | grep -oE '[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+')"
+          chrome_version="$(google-chrome --version | grep -oE '[0-9]+([.][0-9]+){3}' | head -n 1)"
+          if [[ -z "$chrome_version" ]]; then
+            echo "Could not determine the installed Google Chrome version." >&2
+            google-chrome --version >&2 || true
+            exit 1
+          echo "Installing ChromeDriver for Chrome $chrome_version."
+          fi
           npx --yes @puppeteer/browsers install "chromedriver@$chrome_version" --path "$RUNNER_TEMP/chromedriver"
           chromedriver_path="$(find "$RUNNER_TEMP/chromedriver" -type f -name chromedriver -perm -u+x | head -n 1)"
           if [[ -z "$chromedriver_path" ]]; then
