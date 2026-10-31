@@ -72,7 +72,7 @@ else: changes[manifest]=ms.replace(f'android:label="{value}"',f'android:label="{
 activities=[p for p in (android/"src/main").rglob("*") if p.is_file() and p.name in ("MainActivity.kt","MainActivity.java")]
 if len(activities)!=1: raise ValueError(f"Expected one MainActivity.kt/.java; found {len(activities)}.")
 activity=activities[0]
-at=once(read(activity),r"(?m)^package\s+[A-Za-z_][A-Za-z0-9_.]*\s*$",f"package {app_id}","MainActivity package")
+at=once(read(activity),r"(?m)^package\s+[A-Za-z_][A-Za-z0-9_.]*;?\s*$",f"package {app_id}"+(";" if activity.suffix==".java" else ""),"MainActivity package")
 source=android/"src/main"; lang="kotlin" if activity.suffix==".kt" else "java"
 dest=source/lang/Path(*app_id.split("."))/activity.name
 if dest!=activity:
