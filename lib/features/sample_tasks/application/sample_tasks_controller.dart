@@ -19,7 +19,7 @@ class SampleTasksController extends AsyncNotifier<List<SampleTask>> {
   }
 
   void toggleCompleted(String taskId) {
-    final tasks = state.valueOrNull;
+    final tasks = state.value;
     if (tasks == null) {
       return;
     }
