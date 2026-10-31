@@ -43,15 +43,15 @@ def once(s,pat,repl,label):
  if n!=1: raise ValueError(f"Expected exactly one {label}; found {n}. No files changed.")
  return out
 changes={}; moves=[]
-pub=read(pubspec); match=re.search(r"(?m)^name:\s*([a-z][a-z0-9_]*)\s*$",pub)
+pub=read(pubspec); match=re.search(r"(?m)^name:[ \t]*([a-z][a-z0-9_]*)[ \t]*$",pub)
 if not match: raise ValueError("Invalid/missing pubspec name.")
 old_package=match.group(1)
-changes[pubspec]=once(pub,r"(?m)^name:\s*[a-z][a-z0-9_]*\s*$",f"name: {package}","pubspec name")
-spec=once(read(spec_file),r"(?m)^- App name:\s*.*$",f"- App name: {app}","APP_SPEC app name")
+changes[pubspec]=once(pub,r"(?m)^name:[ \t]*[a-z][a-z0-9_]*[ \t]*$",f"name: {package}","pubspec name")
+spec=once(read(spec_file),r"(?m)^- App name:[ \t]*[^\r\n]*$",f"- App name: {app}","APP_SPEC app name")
 if re.search(r"(?m)^- Dart package name:",spec):
- spec=once(spec,r"(?m)^- Dart package name:\s*.*$",f"- Dart package name: {package}","APP_SPEC Dart package")
+ spec=once(spec,r"(?m)^- Dart package name:[ \t]*[^\r\n]*$",f"- Dart package name: {package}","APP_SPEC Dart package")
 else: spec=spec.replace(f"- App name: {app}\n",f"- App name: {app}\n- Dart package name: {package}\n",1)
-changes[spec_file]=once(spec,r"(?m)^- Android application ID:\s*.*$",f"- Android application ID: {app_id}","APP_SPEC Android ID")
+changes[spec_file]=once(spec,r"(?m)^- Android application ID:[ \t]*[^\r\n]*$",f"- Android application ID: {app_id}","APP_SPEC Android ID")
 for p in sorted([*(root/"lib").rglob("*.dart"),*tests.rglob("*.dart")]):
  s=read(p); updated=s.replace("Universal App",dart_app).replace(f"package:{old_package}/",f"package:{package}/")
  if updated!=s: changes[p]=updated
