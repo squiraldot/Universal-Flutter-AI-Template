@@ -31,4 +31,4 @@ third_party/flutter/bin/flutter build web --release
 third_party/flutter/bin/flutter build ios --no-codesign
 ```
 
-Flutter CI enforces a minimum of 80% Dart line coverage for library files represented in the LCOV report. Platform build jobs compile Android and Web on Linux and iOS without code signing on macOS.
+Flutter CI enforces a minimum of 80% Dart line coverage for handwritten library files represented in LCOV. Generated localization code under `lib/l10n/generated/` is excluded because it is tool-generated. Platform build jobs compile Android and Web on Linux and iOS without code signing on macOS.

@@ -12,7 +12,7 @@ fi
 awk -v required="$required_coverage" '
   /^SF:/ {
     source_path = substr($0, 4)
-    in_library = source_path ~ /(^|\/)lib\//
+    in_library = source_path ~ /(^|\/)lib\// && source_path !~ /(^|\/)lib\/l10n\/generated\//
     next
   }
 
@@ -30,7 +30,7 @@ awk -v required="$required_coverage" '
 
   END {
     if (total_lines == 0) {
-      print "No lib/ line coverage records found." > "/dev/stderr"
+      print "No handwritten lib/ line coverage records found." > "/dev/stderr"
       exit 2
     }
 
