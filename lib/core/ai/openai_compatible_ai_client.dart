@@ -216,7 +216,7 @@ class OpenAiCompatibleAiClient implements AiClient {
       milliseconds: milliseconds.clamp(
         1,
         config.maxRetryDelay.inMilliseconds,
-      ),
+      ).toInt(),
     );
     await Future.any<void>([
       Future<void>.delayed(delay),
