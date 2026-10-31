@@ -126,9 +126,7 @@ class OpenAiCompatibleAiClient implements AiClient {
     }
   }
 
-  AiCancellationToken _operationToken(
-    AiCancellationToken? callerCancellation,
-  ) {
+  AiCancellationToken _operationToken(AiCancellationToken? callerCancellation) {
     final operation = AiCancellationToken();
     callerCancellation?.whenCancelled.then((_) => operation.cancel());
     return operation;
@@ -137,18 +135,19 @@ class OpenAiCompatibleAiClient implements AiClient {
   Future<String> _getToken(AiCancellationToken cancellation) async {
     cancellation.throwIfCancelled();
     try {
-      final value = await Future.any<String?>([
-        tokenProvider(),
-        cancellation.whenCancelled.then<String?>(
-          (_) => throw AiException.cancelled(),
-        ),
-      ]).timeout(
-        config.timeout,
-        onTimeout: () {
-          cancellation.cancel();
-          throw TimeoutException('AI token request timed out.');
-        },
-      );
+      final value =
+          await Future.any<String?>([
+            tokenProvider(),
+            cancellation.whenCancelled.then<String?>(
+              (_) => throw AiException.cancelled(),
+            ),
+          ]).timeout(
+            config.timeout,
+            onTimeout: () {
+              cancellation.cancel();
+              throw TimeoutException('AI token request timed out.');
+            },
+          );
       final normalized = value?.trim();
       if (normalized == null || normalized.isEmpty) {
         throw AiException.missingCredentials();
@@ -175,35 +174,37 @@ class OpenAiCompatibleAiClient implements AiClient {
       final attemptCancellation = AiCancellationToken();
       cancellation.whenCancelled.then((_) => attemptCancellation.cancel());
       try {
-        final request = http.AbortableRequest(
-          'POST',
-          config.chatCompletionsUri,
-          abortTrigger: attemptCancellation.whenCancelled,
-        )
-          ..headers.addAll({
-            'content-type': 'application/json',
-            'authorization': 'Bearer $token',
-          })
-          ..body = jsonEncode({
-            'model': config.model,
-            'messages': [
-              {'role': 'user', 'content': prompt},
-            ],
-            'stream': streaming,
-          });
+        final request =
+            http.AbortableRequest(
+                'POST',
+                config.chatCompletionsUri,
+                abortTrigger: attemptCancellation.whenCancelled,
+              )
+              ..headers.addAll({
+                'content-type': 'application/json',
+                'authorization': 'Bearer $token',
+              })
+              ..body = jsonEncode({
+                'model': config.model,
+                'messages': [
+                  {'role': 'user', 'content': prompt},
+                ],
+                'stream': streaming,
+              });
 
-        final response = await Future.any<http.StreamedResponse>([
-          _httpClient.send(request),
-          attemptCancellation.whenCancelled.then<http.StreamedResponse>(
-            (_) => throw AiException.cancelled(),
-          ),
-        ]).timeout(
-          config.timeout,
-          onTimeout: () {
-            attemptCancellation.cancel();
-            throw TimeoutException('AI request timed out.');
-          },
-        );
+        final response =
+            await Future.any<http.StreamedResponse>([
+              _httpClient.send(request),
+              attemptCancellation.whenCancelled.then<http.StreamedResponse>(
+                (_) => throw AiException.cancelled(),
+              ),
+            ]).timeout(
+              config.timeout,
+              onTimeout: () {
+                attemptCancellation.cancel();
+                throw TimeoutException('AI request timed out.');
+              },
+            );
 
         final retryableStatus =
             response.statusCode == 429 || response.statusCode >= 500;
@@ -240,13 +241,11 @@ class OpenAiCompatibleAiClient implements AiClient {
     AiCancellationToken cancellation,
   ) async {
     cancellation.throwIfCancelled();
-    final milliseconds =
-        config.retryBaseDelay.inMilliseconds * (1 << attempt);
+    final milliseconds = config.retryBaseDelay.inMilliseconds * (1 << attempt);
     final delay = Duration(
-      milliseconds: milliseconds.clamp(
-        1,
-        config.maxRetryDelay.inMilliseconds,
-      ).toInt(),
+      milliseconds: milliseconds
+          .clamp(1, config.maxRetryDelay.inMilliseconds)
+          .toInt(),
     );
     await Future.any<void>([
       Future<void>.delayed(delay),
