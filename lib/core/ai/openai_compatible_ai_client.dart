@@ -83,6 +83,11 @@ class OpenAiCompatibleAiClient implements AiClient {
         throw AiException.cancelled();
       }
       throw AiException.network();
+    } catch (_) {
+      if (cancellationToken?.isCancelled ?? false) {
+        throw AiException.cancelled();
+      }
+      throw AiException.network();
     }
   }
 
@@ -281,6 +286,9 @@ class OpenAiCompatibleAiClient implements AiClient {
     } on FormatException {
       throw AiException.invalidResponse();
     } on http.ClientException {
+      if (cancellation.isCancelled) throw AiException.cancelled();
+      throw AiException.network();
+    } catch (_) {
       if (cancellation.isCancelled) throw AiException.cancelled();
       throw AiException.network();
     }
