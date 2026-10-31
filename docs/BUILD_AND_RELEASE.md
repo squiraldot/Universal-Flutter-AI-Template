@@ -64,7 +64,10 @@ The Web output is written to `build/web`. Configure the hosting provider to serv
 - `initialize-new-app.yml`: generates platform scaffolds, applies app identity, resolves packages, generates localization, tests and builds APK/Web artifacts.
 - `initializer-script-tests.yml`: shell syntax and initializer regression tests.
 - `secret-scan.yml`: Gitleaks scans the complete Git history on pushes and pull requests.
+- `flutter-stable-check.yml`: weekly checks the latest Flutter stable release and opens a review issue when newer; it never upgrades the SDK.
 - `release-signed-aab.yml`: manually builds, signs and uploads a release Android App Bundle from `main`.
+
+Before distributing an app, complete [the release checklist](RELEASE_CHECKLIST.md), including version metadata, R8/ProGuard validation, platform permissions and privacy disclosures.
 - Third-party GitHub Actions are pinned to full commit SHAs.
 
 ## Manual signed AAB release
