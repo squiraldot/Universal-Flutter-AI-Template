@@ -30,8 +30,9 @@ It is intentionally app-agnostic. It does not prescribe a chat app, a particular
 
 - AI agent instructions and app-specific specifications
 - Feature-first Dart structure with optional complexity only when needed
-- Pinned Flutter SDK Git submodule
-- GitHub Actions for analysis/tests and debug APK artifacts
+- Pinned Flutter SDK Git submodule with shallow-clone configuration
+- GitHub Actions for analysis/tests, debug APK artifacts, secret scanning and manual signed-AAB releases
+- Weekly Dependabot updates for GitHub Actions and Dart/Flutter dependencies
 - Security, testing, architecture and release guidance
 - Optional provider-independent AI client foundation for apps that need AI
 
@@ -61,7 +62,7 @@ The three arguments are the human-readable app name (1–50 characters), lowerca
 Preview all planned changes without writing files:
 
 ```bash
-bash scripts/init_app.sh --dry-run "Lifebit" lifebit com.squiraldot.lifebit
+bash scripts/init_app.sh --dry-run "My App" my_app com.example.my_app
 ```
 
 The script updates `pubspec.yaml`, Dart package imports, starter app titles and widget-test expectations, `docs/APP_SPEC.md`, Android Gradle namespace/application ID, launcher label, and the `MainActivity` package/path. It validates expected files and patterns before writing, refuses ambiguous Android configurations, and is safe to rerun with the same values. It does not run `flutter pub get`; run that after initialization to refresh the lockfile.
@@ -82,6 +83,10 @@ You can initialize a fresh app without running the scripts locally:
 A dry run uploads only the initialization preview. A full run uploads two separate artifacts: the initialized source archive (including generated Android files and the refreshed lockfile) and the debug APK. The workflow does not commit generated files back to the template repository; download the source artifact and use it as the starting point for your new app repository.
 
 The workflow runs on a clean GitHub-hosted Ubuntu runner and uses the Flutter version configured by this template's CI. It requires no repository secrets.
+
+## Manual signed AAB release
+
+For a production Android App Bundle, configure the four repository Actions secrets documented in [Build and Release](docs/BUILD_AND_RELEASE.md), then run **Manual Signed AAB Release** from the Actions tab against `main`. The workflow uploads a signature-verified AAB artifact and never writes signing credentials into the repository.
 
 ## Commands
 
