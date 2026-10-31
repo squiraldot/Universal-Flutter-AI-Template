@@ -4,7 +4,8 @@
 - Matches approved requirements and existing conventions.
 - Formatting passes; no new analyzer errors.
 - Relevant unit, widget and golden tests pass.
-- Flutter CI enforces at least 80% Dart line coverage for handwritten library files represented in LCOV; generated localization output is excluded.
+- Flutter CI enforces at least 80% Dart line coverage for handwritten library files represented in LCOV; generated localization output is excluded. Set `COVERAGE_THRESHOLD` to override the default deliberately.
+- The integration smoke test runs in CI on Chrome.
 - No secrets or sensitive logs introduced.
 - Diff reviewed; docs updated when needed.
 
@@ -19,6 +20,7 @@
 - Critical journeys have integration tests where practical.
 
 ## Release
+- Complete [the release checklist](RELEASE_CHECKLIST.md).
 - Version/build number and release notes reviewed.
 - Android/iOS signing uses protected credentials and platform-specific release configuration.
 - Web hosting, SPA fallback and cache behavior reviewed.
