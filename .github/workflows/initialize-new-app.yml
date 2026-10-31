@@ -1,0 +1,139 @@
+name: Initialize New App
+
+on:
+  workflow_dispatch:
+    inputs:
+      app_name:
+        description: Human-readable application name
+        required: true
+        type: string
+      dart_package_name:
+        description: Lowercase Dart package name (for example, lifebit)
+        required: true
+        type: string
+      android_application_id:
+        description: Reverse-domain Android application ID
+        required: true
+        type: string
+      dry_run:
+        description: Preview changes without modifying the project or building an APK
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: initialize-app-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  initialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout template
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.8'
+          channel: stable
+          cache: true
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools'
+
+      - name: Install Android SDK packages
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Generate Android scaffold
+        run: bash scripts/bootstrap.sh
+
+      - name: Preview app identity changes
+        env:
+          APP_NAME: ${{ inputs.app_name }}
+          DART_PACKAGE_NAME: ${{ inputs.dart_package_name }}
+          ANDROID_APPLICATION_ID: ${{ inputs.android_application_id }}
+        run: |
+          bash scripts/init_app.sh --dry-run "$APP_NAME" "$DART_PACKAGE_NAME" "$ANDROID_APPLICATION_ID" | tee initialization-plan.txt
+
+      - name: Apply app identity
+        if: ${{ !inputs.dry_run }}
+        env:
+          APP_NAME: ${{ inputs.app_name }}
+          DART_PACKAGE_NAME: ${{ inputs.dart_package_name }}
+          ANDROID_APPLICATION_ID: ${{ inputs.android_application_id }}
+        run: bash scripts/init_app.sh "$APP_NAME" "$DART_PACKAGE_NAME" "$ANDROID_APPLICATION_ID"
+
+      - name: Run initializer safety tests
+        if: ${{ !inputs.dry_run }}
+        run: bash scripts/tests/init_app_test.sh
+
+      - name: Resolve dependencies after package rename
+        if: ${{ !inputs.dry_run }}
+        run: flutter pub get
+
+      - name: Check Dart formatting
+        if: ${{ !inputs.dry_run }}
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Analyze Dart code
+        if: ${{ !inputs.dry_run }}
+        run: flutter analyze
+
+      - name: Run Flutter tests
+        if: ${{ !inputs.dry_run }}
+        run: flutter test
+
+      - name: Build debug APK
+        if: ${{ !inputs.dry_run }}
+        run: flutter build apk --debug
+
+      - name: Package initialized source
+        if: ${{ !inputs.dry_run }}
+        run: |
+          tar -czf initialized-app-source.tar.gz \
+            --exclude=.git \
+            --exclude=.dart_tool \
+            --exclude=build \
+            --exclude=third_party/flutter \
+            --exclude=initialized-app-source.tar.gz \
+            .
+
+      - name: Upload initialization preview
+        if: ${{ inputs.dry_run }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: initialization-preview-${{ github.run_number }}
+          path: initialization-plan.txt
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload initialized source
+        if: ${{ !inputs.dry_run }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: initialized-app-source-${{ github.run_number }}
+          path: initialized-app-source.tar.gz
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload debug APK
+        if: ${{ !inputs.dry_run }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: initialized-app-debug-apk-${{ github.run_number }}
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
