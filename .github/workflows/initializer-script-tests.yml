@@ -1,0 +1,31 @@
+name: Initializer Script Tests
+
+on:
+  push:
+    branches:
+      - main
+      - "fix/**"
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: initializer-tests-\${{ github.workflow }}-\${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  initializer-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check shell syntax
+        run: bash -n scripts/init_app.sh scripts/tests/init_app_test.sh
+
+      - name: Run initializer safety tests
+        run: bash scripts/tests/init_app_test.sh
