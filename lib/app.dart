@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'core/routing/app_router.dart';
+import 'core/routing/app_routes.dart';
 import 'core/theme/app_theme.dart';
-import 'features/home/presentation/home_page.dart';
 
 class UniversalApp extends StatelessWidget {
   const UniversalApp({super.key});
@@ -14,7 +15,9 @@ class UniversalApp extends StatelessWidget {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: ThemeMode.system,
-      home: const HomePage(),
+      initialRoute: AppRoutes.home,
+      onGenerateRoute: AppRouter.onGenerateRoute,
+      onUnknownRoute: AppRouter.onUnknownRoute,
     );
   }
 }
