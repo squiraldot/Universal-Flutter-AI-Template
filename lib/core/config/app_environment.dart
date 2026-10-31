@@ -1,17 +1,22 @@
+import 'package:flutter/foundation.dart';
+
 enum AppEnvironmentName { development, staging, production }
 
 final class AppEnvironment {
   const AppEnvironment._({required this.name, required this.apiBaseUrl});
 
-  factory AppEnvironment.fromBuildDefines() {
-    const environmentName = String.fromEnvironment(
-      'APP_ENV',
-      defaultValue: 'development',
-    );
+  factory AppEnvironment.fromBuildDefines({bool isRelease = kReleaseMode}) {
+    const environmentName = String.fromEnvironment('APP_ENV');
     const apiBaseUrlValue = String.fromEnvironment('API_BASE_URL');
 
+    if (environmentName.isEmpty && isRelease) {
+      throw const FormatException(
+        'APP_ENV must be set explicitly for release builds.',
+      );
+    }
+
     return AppEnvironment.fromValues(
-      name: environmentName,
+      name: environmentName.isEmpty ? 'development' : environmentName,
       apiBaseUrl: apiBaseUrlValue.isEmpty ? null : apiBaseUrlValue,
     );
   }
@@ -46,7 +51,9 @@ final class AppEnvironment {
         !uri.hasAuthority ||
         uri.host.isEmpty ||
         (uri.scheme != 'http' && uri.scheme != 'https')) {
-      throw FormatException('API_BASE_URL must be an absolute HTTP(S) URL.');
+      throw const FormatException(
+        'API_BASE_URL must be an absolute HTTP(S) URL.',
+      );
     }
 
     return uri;

@@ -3,11 +3,18 @@ import 'package:universal_app/core/config/app_environment.dart';
 
 void main() {
   group('AppEnvironment.fromValues', () {
-    test('defaults to development when using build defines', () {
-      final environment = AppEnvironment.fromBuildDefines();
+    test('defaults to development when using build defines in debug mode', () {
+      final environment = AppEnvironment.fromBuildDefines(isRelease: false);
 
       expect(environment.name, AppEnvironmentName.development);
       expect(environment.apiBaseUrl, isNull);
+    });
+
+    test('requires an explicit environment for release builds', () {
+      expect(
+        () => AppEnvironment.fromBuildDefines(isRelease: true),
+        throwsFormatException,
+      );
     });
 
     test('accepts each supported environment name', () {
