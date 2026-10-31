@@ -36,6 +36,8 @@ jobs:
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
       - name: Bootstrap Android scaffold and resolve dependencies
         run: bash scripts/bootstrap.sh
+      - name: Test app initializer
+        run: bash scripts/tests/init_app_test.sh
       - uses: actions/cache@v4
         with:
           # Cache downloaded packages only. Never restore .dart_tool after pub get:
