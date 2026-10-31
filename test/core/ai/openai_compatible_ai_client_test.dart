@@ -140,13 +140,10 @@ void main() {
 
   test('maps exhausted 429 responses to rate-limit errors', () async {
     var calls = 0;
-    final client = create(
-      (_) async {
-        calls++;
-        return http.Response('provider detail', 429);
-      },
-      aiConfig: config(maxRetries: 1),
-    );
+    final client = create((_) async {
+      calls++;
+      return http.Response('provider detail', 429);
+    }, aiConfig: config(maxRetries: 1));
 
     await expectLater(
       client.complete('Hello'),
@@ -162,30 +159,27 @@ void main() {
     client.close();
   });
 
-  test('retries transient server errors with a bounded attempt count', () async {
-    var calls = 0;
-    final client = create(
-      (_) async {
+  test(
+    'retries transient server errors with a bounded attempt count',
+    () async {
+      var calls = 0;
+      final client = create((_) async {
         calls++;
         return calls < 3 ? http.Response('unavailable', 503) : success('done');
-      },
-      aiConfig: config(maxRetries: 2),
-    );
+      }, aiConfig: config(maxRetries: 2));
 
-    expect(await client.complete('Hello'), 'done');
-    expect(calls, 3);
-    client.close();
-  });
+      expect(await client.complete('Hello'), 'done');
+      expect(calls, 3);
+      client.close();
+    },
+  );
 
   test('does not exceed configured retry limit', () async {
     var calls = 0;
-    final client = create(
-      (_) async {
-        calls++;
-        return http.Response('unavailable', 503);
-      },
-      aiConfig: config(maxRetries: 2),
-    );
+    final client = create((_) async {
+      calls++;
+      return http.Response('unavailable', 503);
+    }, aiConfig: config(maxRetries: 2));
 
     await expectLater(client.complete('Hello'), throwsA(isA<AiException>()));
     expect(calls, 3);
@@ -211,13 +205,10 @@ void main() {
   });
 
   test('maps request timeout to timeout error', () async {
-    final client = create(
-      (_) async {
-        await Future<void>.delayed(const Duration(milliseconds: 40));
-        return success('late');
-      },
-      aiConfig: config(timeout: const Duration(milliseconds: 5)),
-    );
+    final client = create((_) async {
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+      return success('late');
+    }, aiConfig: config(timeout: const Duration(milliseconds: 5)));
 
     await expectLater(
       client.complete('Hello'),
@@ -236,10 +227,7 @@ void main() {
     final pending = Completer<http.Response>();
     final cancellation = AiCancellationToken();
     final client = create((_) => pending.future);
-    final operation = client.complete(
-      'Hello',
-      cancellationToken: cancellation,
-    );
+    final operation = client.complete('Hello', cancellationToken: cancellation);
     await Future<void>.delayed(const Duration(milliseconds: 1));
     cancellation.cancel();
 
@@ -339,5 +327,4 @@ void main() {
     await expectLater(transport.abortTrigger!, completes);
     client.close();
   });
-
 }
