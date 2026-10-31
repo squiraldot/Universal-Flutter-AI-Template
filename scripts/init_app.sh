@@ -39,7 +39,7 @@ if missing:
  print("Run 'bash scripts/bootstrap.sh' first.",file=sys.stderr); sys.exit(1)
 def read(p): return p.read_text(encoding="utf-8")
 def once(s,pat,repl,label):
- out,n=re.subn(pat,repl,s,count=1)
+ out,n=re.subn(pat,(lambda _: repl) if isinstance(repl,str) else repl,s,count=1)
  if n!=1: raise ValueError(f"Expected exactly one {label}; found {n}. No files changed.")
  return out
 changes={}; moves=[]
