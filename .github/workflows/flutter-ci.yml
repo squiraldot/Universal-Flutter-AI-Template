@@ -71,7 +71,12 @@ jobs:
         run: flutter test --coverage
 
       - name: Enforce minimum Dart line coverage
+        env:
+          COVERAGE_THRESHOLD: '80'
         run: bash scripts/check_coverage.sh
+
+      - name: Run integration smoke test on Chrome
+        run: flutter test integration_test -d chrome
 
       - name: Build debug APK
         run: flutter build apk --debug --dart-define-from-file=config/development.json
