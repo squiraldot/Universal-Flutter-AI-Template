@@ -26,7 +26,12 @@ third_party/flutter/bin/dart format --output=none --set-exit-if-changed lib test
 third_party/flutter/bin/flutter analyze
 third_party/flutter/bin/flutter test --coverage
 bash scripts/check_coverage.sh
-# Web integration tests require a matching ChromeDriver on PATH and a running ChromeDriver service.
+# Web integration tests require Chrome and a matching ChromeDriver.
+chrome_version="$(google-chrome --version | grep -oE '[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+')"
+npx --yes @puppeteer/browsers install "chromedriver@$chrome_version" --path "$HOME/.cache/chromedriver"
+chromedriver_path="$(find "$HOME/.cache/chromedriver" -type f -name chromedriver -perm -u+x | head -n 1)"
+export PATH="$(dirname "$chromedriver_path"):$PATH"
+chromedriver --port=4444 &
 third_party/flutter/bin/flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_smoke_test.dart -d web-server --browser-name=chrome --web-port=7357
 third_party/flutter/bin/flutter build apk --debug --dart-define-from-file=config/development.json
 third_party/flutter/bin/flutter build web --release --dart-define-from-file=config/production.json
