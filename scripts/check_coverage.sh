@@ -9,6 +9,15 @@ if [[ ! -f "$coverage_file" ]]; then
   exit 2
 fi
 
+if ! awk -v required="$required_coverage" 'BEGIN {
+  if (required !~ /^[0-9]+([.][0-9]+)?$/ || required < 0 || required > 100) {
+    exit 1
+  }
+}'; then
+  echo "COVERAGE_THRESHOLD must be a number between 0 and 100 (received: $required_coverage)." >&2
+  exit 2
+fi
+
 awk -v required="$required_coverage" '
   /^SF:/ {
     source_path = substr($0, 4)
