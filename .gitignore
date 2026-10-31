@@ -31,3 +31,6 @@ Thumbs.db
 *.log
 *.tmp
 *.bak
+
+# Generated Flutter localization source
+lib/l10n/generated/

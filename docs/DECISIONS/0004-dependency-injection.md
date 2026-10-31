@@ -1,6 +1,6 @@
 # ADR 0004: Dependency Injection
 
-- **Status:** Proposed — awaiting user approval
+- **Status:** Accepted
 - **Date:** 2026-10-31
 - **Branch:** `main`
 - **Scope:** Construction and lifecycle of application services, repositories and feature dependencies.
@@ -28,6 +28,6 @@ If ADR 0002 is not approved, revisit this recommendation rather than introducing
 - Keep lifecycle-sensitive resources (clients, controllers, streams) explicitly disposed.
 - Do not create abstractions for dependencies that have no real boundary or test value.
 
-## Approval gate
+## Approval and implementation
 
-This is a proposal only. Do not add DI packages or restructure service construction until the user explicitly approves this ADR and the related state-management choice.
+Approved by the user on 2026-10-31. This decision is implemented in the shared app foundation and sample feature.

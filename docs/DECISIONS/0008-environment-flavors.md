@@ -1,6 +1,6 @@
 # ADR 0008: Build Environments and Flavors
 
-- **Status:** Proposed — awaiting user approval
+- **Status:** Accepted
 - **Date:** 2026-10-31
 - **Branch:** `main`
 - **Scope:** Development, staging and production configuration for Android, iOS and Web builds.
@@ -43,6 +43,6 @@ The exact platform build matrix and flavor naming (including Android productFlav
 - Verify that no secrets are present in tracked JSON files, generated artifacts or logs.
 - This decision configures Dart compile-time environments; it does not by itself provision backend infrastructure or signing credentials.
 
-## Approval gate
+## Approval and implementation
 
-This is a proposal only. Do not create environment files, change build workflows or implement environment-specific behavior until the user explicitly approves this ADR.
+Approved by the user on 2026-10-31. This decision is implemented in the shared app foundation and sample feature.

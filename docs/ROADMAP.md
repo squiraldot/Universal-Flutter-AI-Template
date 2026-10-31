@@ -15,20 +15,20 @@ AI is an optional capability. The provider-independent AI client belongs in an o
 - [x] Unsigned iOS build validation on macOS CI
 - [x] Documented security, testing, architecture and release expectations
 
-### 2. Universal app core — next priority
-- [ ] Define stable app entry points and environment/configuration boundaries
-- [ ] Establish routing/navigation conventions that scale beyond one screen
-- [ ] Add reusable theme tokens, typography, spacing and component conventions
-- [ ] Establish consistent loading, empty, error and retry patterns
-- [ ] Keep the default Home screen generic and easy to replace
-- [ ] Add focused tests for the core app shell
+### 2. Universal app core — implemented; CI verification pending
+- [x] Define stable app entry points and environment/configuration boundaries
+- [x] Establish routing/navigation conventions that scale beyond one screen
+- [x] Add reusable theme tokens, typography, spacing and component conventions
+- [x] Establish consistent loading, empty, error and retry patterns
+- [x] Keep the default Home screen generic and easy to replace
+- [x] Add focused tests for the core app shell
 
-### 3. Common app infrastructure
-- [ ] Select and document a state-management approach based on maintainability
-- [ ] Add repository/service boundaries and typed result/error conventions
+### 3. Common app infrastructure — initial conventions implemented
+- [x] Select and document a state-management approach based on maintainability
+- [x] Add repository/service boundaries and typed result/error conventions
 - [ ] Add a storage abstraction with a small tested implementation only when needed
-- [ ] Add privacy-conscious logging and environment-specific configuration
-- [ ] Document dependency and package-addition rules
+- [x] Add privacy-conscious logging and environment-specific configuration
+- [x] Document dependency and package-addition rules
 
 ### 4. Optional capability modules
 - [ ] Keep AI integration behind a provider-independent contract
@@ -36,7 +36,7 @@ AI is an optional capability. The provider-independent AI client belongs in an o
 - [ ] Add integrations only as independent, documented modules when a real app requires them
 
 ### 5. Template usability and release readiness
-- [ ] Document the “new app from template” workflow end-to-end
+- [x] Document the “new app from template” workflow end-to-end
 - [ ] Verify bootstrap from a clean checkout on Linux and macOS
 - [ ] Verify Android, iOS and Web builds on the current CI head
 - [ ] Add a release checklist for app-specific package IDs, icons, permissions, signing, hosting and privacy disclosures

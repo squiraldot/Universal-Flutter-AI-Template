@@ -100,6 +100,10 @@ jobs:
         if: ${{ !inputs.dry_run }}
         run: flutter pub get
 
+      - name: Generate localization
+        if: ${{ !inputs.dry_run }}
+        run: flutter gen-l10n
+
       - name: Check Dart formatting
         if: ${{ !inputs.dry_run }}
         run: dart format --output=none --set-exit-if-changed lib test

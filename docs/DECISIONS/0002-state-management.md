@@ -1,6 +1,6 @@
 # ADR 0002: State Management
 
-- **Status:** Proposed — awaiting user approval
+- **Status:** Accepted
 - **Date:** 2026-10-31
 - **Branch:** `main`
 - **Scope:** Shared state-management convention for future features.
@@ -28,6 +28,6 @@ This balances testability and async state handling with a feature-first architec
 - Do not introduce GetX, Provider, BLoC or a second state framework alongside the selected convention without a new ADR.
 - State management is not a persistence solution; storage remains behind repository/service boundaries.
 
-## Approval gate
+## Approval and implementation
 
-This is a proposal only. Do not add dependencies or implement state management until the user explicitly approves this ADR.
+Approved by the user on 2026-10-31. This decision is implemented in the shared app foundation and sample feature.

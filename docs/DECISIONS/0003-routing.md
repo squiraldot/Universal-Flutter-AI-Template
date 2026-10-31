@@ -1,6 +1,6 @@
 # ADR 0003: Application Routing
 
-- **Status:** Proposed — awaiting user approval
+- **Status:** Accepted
 - **Date:** 2026-10-31
 - **Branch:** `main`
 - **Scope:** Navigation conventions across Android, iOS and Web.
@@ -26,6 +26,6 @@ Adopt **go_router** as the default routing layer after approval. Keep route decl
 - Preserve the generic Home feature as the default entry point.
 - Do not mix direct route generation and go_router as competing application-wide systems.
 
-## Approval gate
+## Approval and implementation
 
-This is a proposal only. Do not add a router dependency or migrate navigation until the user explicitly approves this ADR.
+Approved by the user on 2026-10-31. This decision is implemented in the shared app foundation and sample feature.

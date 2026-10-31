@@ -1,14 +1,22 @@
 # Testing Strategy
 
 - Unit tests: pure business rules, validation and transformations.
-- Widget tests: UI states, interactions, semantics and accessibility.
+- Provider/controller tests: repository overrides, async state, state transitions and retry behavior.
+- Widget tests: UI states, interactions, semantics, localization and accessibility.
 - Golden tests: stable visual snapshots for important starter UI.
 - Integration tests: critical journeys, plugin behavior and real app boundaries.
 - Initializer shell tests: fixture-based checks for platform identity changes, validation, dry-run immutability and repeat-run idempotence.
 
-Test observable outcomes, not private implementation details. Prefer real implementations or fakes; mock external boundaries only when needed. Cover errors, empty data, offline behavior and denied permissions where relevant. Keep tests independent and descriptive; avoid brittle snapshots and timing-based assertions.
+Test observable outcomes, not private implementation details. Prefer real implementations or fakes; mock external boundaries only when needed. Cover loading, empty, error, retry, offline behavior and denied permissions where relevant. Keep tests independent and descriptive.
 
-Flutter CI runs the full test suite with coverage and enforces a minimum of 80% Dart line coverage for the library files represented in the LCOV report. Platform build jobs additionally compile Android and Web on Linux and iOS without code signing on macOS.
+Generate localization before analysis/format checks:
+
+```bash
+third_party/flutter/bin/flutter pub get
+third_party/flutter/bin/flutter gen-l10n
+```
+
+Run the repository checks:
 
 ```bash
 bash -n scripts/bootstrap.sh scripts/init_app.sh scripts/tests/init_app_test.sh
@@ -22,3 +30,5 @@ third_party/flutter/bin/flutter build web --release
 # macOS + Xcode only:
 third_party/flutter/bin/flutter build ios --no-codesign
 ```
+
+Flutter CI enforces a minimum of 80% Dart line coverage for library files represented in the LCOV report. Platform build jobs compile Android and Web on Linux and iOS without code signing on macOS.

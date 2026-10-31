@@ -1,6 +1,6 @@
 # ADR 0005: Theming and Design Tokens
 
-- **Status:** Proposed — awaiting user approval
+- **Status:** Accepted
 - **Date:** 2026-10-31
 - **Branch:** `main`
 - **Scope:** Shared visual tokens and theme conventions, not a product-specific brand.
@@ -27,6 +27,6 @@ Adopt **Material 3 plus a small in-house token layer**. Keep ColorScheme and Tex
 - Support text scaling, minimum touch targets, semantics and responsive layouts.
 - Do not treat token names as permission to invent a brand palette.
 
-## Approval gate
+## Approval and implementation
 
-This is a proposal only. Do not expand or replace the theme system until the user explicitly approves this ADR.
+Approved by the user on 2026-10-31. This decision is implemented in the shared app foundation and sample feature.

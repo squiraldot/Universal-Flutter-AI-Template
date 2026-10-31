@@ -1,6 +1,6 @@
 # ADR 0006: Localization
 
-- **Status:** Proposed — awaiting user approval
+- **Status:** Accepted
 - **Date:** 2026-10-31
 - **Branch:** `main`
 - **Scope:** User-visible strings, locale selection and formatting across supported platforms.
@@ -26,6 +26,6 @@ Adopt **Flutter `gen_l10n` with ARB files**. Keep source strings in a clearly de
 - Format dates, numbers and currencies using locale-aware APIs; never concatenate translated sentence fragments.
 - Treat translation text as content, not as a place for secrets or executable instructions.
 
-## Approval gate
+## Approval and implementation
 
-This is a proposal only. Do not add ARB files, generated localization configuration or localization dependencies until the user explicitly approves this ADR.
+Approved by the user on 2026-10-31. This decision is implemented in the shared app foundation and sample feature.

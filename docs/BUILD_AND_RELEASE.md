@@ -17,7 +17,35 @@ The bootstrap script uses `flutter create --platforms=android,ios,web` in a temp
 1. Install Flutter and initialize its submodule: `git submodule update --init --recursive`.
 2. Install JDK and Android SDK for Android builds; install Xcode on macOS for iOS builds.
 3. Run `bash scripts/bootstrap.sh`.
-4. Review generated Android, iOS and Web files and commit them with `pubspec.lock`.
+4. Resolve dependencies and generate localization: `third_party/flutter/bin/flutter pub get` then `third_party/flutter/bin/flutter gen-l10n`.
+5. Review generated platform files and commit `pubspec.lock` when creating a concrete app.
+
+## Development, staging and production configuration
+
+The repository includes three tracked, non-secret JSON files:
+
+- `config/development.json`
+- `config/staging.json`
+- `config/production.json`
+
+Each currently contains only its matching `APP_ENV` value. No API endpoint is assumed. Add `API_BASE_URL` only when the target app has a real, public client endpoint.
+
+Run locally:
+
+```bash
+third_party/flutter/bin/flutter run --dart-define-from-file=config/development.json
+third_party/flutter/bin/flutter run --dart-define-from-file=config/staging.json
+third_party/flutter/bin/flutter run --dart-define-from-file=config/production.json
+```
+
+Build examples:
+
+```bash
+third_party/flutter/bin/flutter build apk --release --dart-define-from-file=config/production.json
+third_party/flutter/bin/flutter build web --release --dart-define-from-file=config/staging.json
+```
+
+These files configure Dart compile-time values only. They do not create native Android product flavors or iOS schemes, and they do not secure values embedded in an APK, IPA or Web bundle. Never put API keys, tokens, passwords, signing material or personal data in them. Keep privileged credentials on a trusted backend. Production commands must explicitly select the production file rather than relying on the development default.
 
 ## Build commands
 
@@ -32,14 +60,12 @@ The Web output is written to `build/web`. Configure the hosting provider to serv
 
 ## CI
 
-- `flutter-ci.yml`: formatting, analysis, tests, coverage, Android debug APK and Web release bundle on Ubuntu; unsigned iOS build on macOS.
-- `initialize-new-app.yml`: generate all three platform scaffolds, apply app identity and upload initialized source, Android APK and Web bundle artifacts.
+- `flutter-ci.yml`: resolves packages, generates localization, formats, analyzes, tests, enforces coverage, and builds Android/Web on Ubuntu; unsigned iOS build on macOS.
+- `initialize-new-app.yml`: generates platform scaffolds, applies app identity, resolves packages, generates localization, tests and builds APK/Web artifacts.
 - `initializer-script-tests.yml`: shell syntax and initializer regression tests.
 - `secret-scan.yml`: Gitleaks scans the complete Git history on pushes and pull requests.
 - `release-signed-aab.yml`: manually builds, signs and uploads a release Android App Bundle from `main`.
-- Flutter SDK and Gradle dependency caches are enabled in Android build workflows.
 - Third-party GitHub Actions are pinned to full commit SHAs.
-- Dependabot has weekly schedules for GitHub Actions and Pub dependencies, but the configured zero-open-PR limits prevent it from opening version-update pull requests.
 
 ## Manual signed AAB release
 

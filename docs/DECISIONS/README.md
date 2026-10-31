@@ -1,12 +1,12 @@
 # Architecture Decision Records
 
-Create one Markdown file per durable decision. Each record states its status, context and constraints, options, recommendation, consequences, testing implications and approval gate.
+Each durable decision records its status, context, options, recommendation, consequences and testing implications.
 
 ## Existing baseline
 
-- [0001 — Minimal Universal App Baseline](0001-minimal-universal-app-baseline.md) — existing baseline proposal and approval gate.
+- [0001 — Minimal Universal App Baseline](0001-minimal-universal-app-baseline.md) — previously accepted baseline foundation.
 
-## Proposed decisions — awaiting user approval
+## Accepted decisions
 
 - [0002 — State Management](0002-state-management.md)
 - [0003 — Routing](0003-routing.md)
@@ -16,4 +16,4 @@ Create one Markdown file per durable decision. Each record states its status, co
 - [0007 — Error Reporting and Diagnostics](0007-error-reporting.md)
 - [0008 — Build Environments and Flavors](0008-environment-flavors.md)
 
-These proposals are not implementation authorization. Approve or revise each decision explicitly before code, dependencies, configuration files or workflows are changed. All approved implementation work remains on `main`.
+All approved implementation work is kept on `main`. Revisit an accepted decision through a new ADR when requirements or platform constraints materially change.

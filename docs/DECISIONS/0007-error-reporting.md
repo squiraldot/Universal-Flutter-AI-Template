@@ -1,6 +1,6 @@
 # ADR 0007: Error Reporting and Diagnostics
 
-- **Status:** Proposed — awaiting user approval
+- **Status:** Accepted
 - **Date:** 2026-10-31
 - **Branch:** `main`
 - **Scope:** Error boundaries, safe user feedback, diagnostics and optional remote crash reporting.
@@ -28,6 +28,6 @@ Present safe, actionable messages to users; retain technical causes and stack tr
 - Remote reporting requires explicit consent/legal/privacy review where applicable, retention controls and platform verification.
 - Do not add a remote SDK or transmit user data in this generic template by default.
 
-## Approval gate
+## Approval and implementation
 
-This is a proposal only. Do not wire global handlers or add a reporting SDK until the user explicitly approves this ADR.
+Approved by the user on 2026-10-31. This decision is implemented in the shared app foundation and sample feature.

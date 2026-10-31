@@ -45,6 +45,28 @@ Flutter Web is intended for app-style experiences. It is not a replacement for a
 - Security, testing, architecture and release guidance
 - Optional provider-independent AI client foundation for apps that need AI
 
+## Core architecture conventions
+
+- **State and dependency injection:** Riverpod 3 providers and feature-owned async controllers; constructor injection for plain Dart classes.
+- **Navigation:** go_router with centralized route definitions and Web URL support.
+- **UI system:** Material 3 themes plus shared spacing, radius and motion tokens.
+- **Localization:** Flutter `gen_l10n` with ARB resources. Generate before analysis with `flutter gen-l10n`.
+- **Error reporting:** local Flutter framework/platform error forwarding through the injectable logger; no remote telemetry SDK is enabled by default.
+- **Sample feature:** a small task checklist demonstrates repository injection, loading/empty/error/retry states and state updates.
+
+## Run with an environment
+
+After `flutter pub get`, generate localization and run one of the explicit public configuration files:
+
+```bash
+third_party/flutter/bin/flutter gen-l10n
+third_party/flutter/bin/flutter run --dart-define-from-file=config/development.json
+third_party/flutter/bin/flutter run --dart-define-from-file=config/staging.json
+third_party/flutter/bin/flutter build apk --release --dart-define-from-file=config/production.json
+```
+
+The JSON files contain only `APP_ENV` names. `--dart-define-from-file` does not encrypt values; never place secrets in them. These Dart configurations do not create native Android product flavors or iOS schemes.
+
 The default starter screen stays app-agnostic. This repository is a template, not a prebuilt chat application: app-specific screens and features must be added only from the target app's approved specification.
 
 No folder structure can guarantee zero issues for every app. This template reduces avoidable problems; app-specific plugins, backend, permissions, browser constraints and release configuration still require validation.
@@ -104,6 +126,8 @@ git submodule update --init --recursive
 bash scripts/bootstrap.sh
 bash scripts/init_app.sh --dry-run --ios-bundle-id com.example.my_app "My App" my_app com.example.my_app
 bash scripts/init_app.sh --ios-bundle-id com.example.my_app "My App" my_app com.example.my_app
+third_party/flutter/bin/flutter pub get
+third_party/flutter/bin/flutter gen-l10n
 third_party/flutter/bin/dart format lib test
 third_party/flutter/bin/flutter analyze
 third_party/flutter/bin/flutter test --coverage
