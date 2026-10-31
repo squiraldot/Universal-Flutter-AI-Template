@@ -91,7 +91,7 @@ class OpenAiCompatibleAiClient implements AiClient {
         cancellation: cancellation,
         streaming: true,
       );
-      _throwForStatus(result.response.statusCode);
+      _throwForStatus(result);
       yield* _decodeEvents(result.response, result.cancellation);
       completed = true;
     } finally {
