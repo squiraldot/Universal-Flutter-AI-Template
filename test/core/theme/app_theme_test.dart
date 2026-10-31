@@ -34,7 +34,8 @@ void main() {
     expect(AppSpacing.xs, 4);
     expect(AppSpacing.sm, 8);
     expect(AppSpacing.md, 16);
-    expect(AppSpacing.xl, 24);
+    expect(AppSpacing.xl, 32);
+    expect(AppSpacing.lg, 24);
     expect(AppRadii.sm, 8);
     expect(AppRadii.md, 12);
     expect(AppRadii.lg, 16);
