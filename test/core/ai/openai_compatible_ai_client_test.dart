@@ -19,7 +19,7 @@ class _HangingStreamClient extends http.BaseClient {
     abortTrigger = abortable.abortTrigger;
     final body = StreamController<List<int>>();
     body.add(
-      utf8.encode('data: {"choices":[{"delta":{"content":"first"}}]}\\n\\n'),
+      utf8.encode('data: {"choices":[{"delta":{"content":"first"}}]}\n\n'),
     );
     abortable.abortTrigger?.then((_) {
       if (!body.isClosed) body.close();
