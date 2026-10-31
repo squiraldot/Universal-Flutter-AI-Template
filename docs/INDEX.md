@@ -10,5 +10,6 @@ Read in this order:
 7. `UI_DESIGN_SYSTEM.md` — visual conventions
 8. `SECURITY.md` — privacy and credentials
 9. `BUILD_AND_RELEASE.md` — build and signing
-10. `TESTING.md` — test strategy
-11. `DECISIONS/` and `features/` — durable decisions and feature specs
+10. `RELEASE_CHECKLIST.md` — pre-release review for versioning, Android shrinking, permissions and privacy
+11. `TESTING.md` — test strategy
+12. `DECISIONS/` and `features/` — durable decisions and feature specs
