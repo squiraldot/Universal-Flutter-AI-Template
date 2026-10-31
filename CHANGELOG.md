@@ -32,7 +32,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Signed release credentials are read from GitHub Actions secrets and the
   temporary keystore is removed from the runner after signing.
 
-### CI
+### Added
 - GitHub Actions run Flutter formatting, analysis, tests, coverage checks, and
   debug APK builds with downloadable artifacts.
 - Manual signed Android App Bundle workflow builds from `main`, verifies the
