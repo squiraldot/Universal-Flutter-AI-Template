@@ -27,7 +27,12 @@ third_party/flutter/bin/flutter analyze
 third_party/flutter/bin/flutter test --coverage
 bash scripts/check_coverage.sh
 # Web integration tests require Chrome and a matching ChromeDriver.
-chrome_version="$(google-chrome --version | grep -oE '[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+')"
+chrome_version="$(google-chrome --version | grep -oE '[0-9]+([.][0-9]+){3}' | head -n 1)"
+if [[ -z "$chrome_version" ]]; then
+  echo "Could not determine the installed Google Chrome version." >&2
+  google-chrome --version >&2 || true
+  exit 1
+fi
 npx --yes @puppeteer/browsers install "chromedriver@$chrome_version" --path "$HOME/.cache/chromedriver"
 chromedriver_path="$(find "$HOME/.cache/chromedriver" -type f -name chromedriver -perm -u+x | head -n 1)"
 export PATH="$(dirname "$chromedriver_path"):$PATH"
