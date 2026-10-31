@@ -37,17 +37,18 @@ class OpenAiCompatibleAiClient implements AiClient {
     AiCancellationToken? cancellationToken,
   }) async {
     _validatePrompt(prompt);
-    final token = await _getToken(cancellationToken);
-    final response = await _sendWithRetries(
+    final cancellation = _operationToken(cancellationToken);
+    final token = await _getToken(cancellation);
+    final result = await _sendWithRetries(
       prompt: prompt.trim(),
       token: token,
-      cancellationToken: cancellationToken,
+      cancellation: cancellation,
       streaming: false,
     );
-    _throwForStatus(response.statusCode);
+    _throwForStatus(result.response.statusCode);
 
+    final body = await _readBody(result.response, result.cancellation);
     try {
-      final body = await _readBody(response, cancellationToken);
       final decoded = jsonDecode(body);
       if (decoded is! Map<String, dynamic>) {
         throw const FormatException('Expected a JSON object.');
@@ -69,25 +70,8 @@ class OpenAiCompatibleAiClient implements AiClient {
         throw const FormatException('Missing text content.');
       }
       return content.trim();
-    } on AiException {
-      rethrow;
     } on FormatException {
       throw AiException.invalidResponse();
-    } on TimeoutException {
-      if (cancellationToken?.isCancelled ?? false) {
-        throw AiException.cancelled();
-      }
-      throw AiException.timeout();
-    } on http.ClientException {
-      if (cancellationToken?.isCancelled ?? false) {
-        throw AiException.cancelled();
-      }
-      throw AiException.network();
-    } catch (_) {
-      if (cancellationToken?.isCancelled ?? false) {
-        throw AiException.cancelled();
-      }
-      throw AiException.network();
     }
   }
 
@@ -97,41 +81,48 @@ class OpenAiCompatibleAiClient implements AiClient {
     AiCancellationToken? cancellationToken,
   }) async* {
     _validatePrompt(prompt);
-    final token = cancellationToken ?? AiCancellationToken();
+    final cancellation = _operationToken(cancellationToken);
     var completed = false;
     try {
-      final accessToken = await _getToken(token);
-      final response = await _sendWithRetries(
+      final accessToken = await _getToken(cancellation);
+      final result = await _sendWithRetries(
         prompt: prompt.trim(),
         token: accessToken,
-        cancellationToken: token,
+        cancellation: cancellation,
         streaming: true,
       );
-      _throwForStatus(response.statusCode);
-      yield* _decodeEvents(response, token);
+      _throwForStatus(result.response.statusCode);
+      yield* _decodeEvents(result.response, result.cancellation);
       completed = true;
-    } on AiException {
-      rethrow;
-    } on TimeoutException {
-      if (token.isCancelled) throw AiException.cancelled();
-      throw AiException.timeout();
-    } on http.ClientException {
-      if (token.isCancelled) throw AiException.cancelled();
-      throw AiException.network();
     } finally {
-      // Also aborts the HTTP request when a consumer cancels its subscription.
-      if (!completed) token.cancel();
+      // A cancelled consumer stops the source subscription and HTTP request.
+      if (!completed) cancellation.cancel();
     }
   }
 
-  Future<String> _getToken(AiCancellationToken? cancellationToken) async {
-    final token = cancellationToken ?? AiCancellationToken();
-    token.throwIfCancelled();
+  AiCancellationToken _operationToken(
+    AiCancellationToken? callerCancellation,
+  ) {
+    final operation = AiCancellationToken();
+    callerCancellation?.whenCancelled.then((_) => operation.cancel());
+    return operation;
+  }
+
+  Future<String> _getToken(AiCancellationToken cancellation) async {
+    cancellation.throwIfCancelled();
     try {
       final value = await Future.any<String?>([
         tokenProvider(),
-        token.whenCancelled.then<String?>((_) => throw AiException.cancelled()),
-      ]).timeout(config.timeout);
+        cancellation.whenCancelled.then<String?>(
+          (_) => throw AiException.cancelled(),
+        ),
+      ]).timeout(
+        config.timeout,
+        onTimeout: () {
+          cancellation.cancel();
+          throw TimeoutException('AI token request timed out.');
+        },
+      );
       final normalized = value?.trim();
       if (normalized == null || normalized.isEmpty) {
         throw AiException.missingCredentials();
@@ -140,28 +131,28 @@ class OpenAiCompatibleAiClient implements AiClient {
     } on AiException {
       rethrow;
     } on TimeoutException {
-      if (token.isCancelled) throw AiException.cancelled();
       throw AiException.timeout();
     } catch (_) {
-      if (token.isCancelled) throw AiException.cancelled();
+      if (cancellation.isCancelled) throw AiException.cancelled();
       throw AiException.network();
     }
   }
 
-  Future<http.StreamedResponse> _sendWithRetries({
+  Future<_AiHttpResponse> _sendWithRetries({
     required String prompt,
     required String token,
-    required AiCancellationToken? cancellationToken,
+    required AiCancellationToken cancellation,
     required bool streaming,
   }) async {
-    final cancellation = cancellationToken ?? AiCancellationToken();
     for (var attempt = 0; ; attempt++) {
       cancellation.throwIfCancelled();
+      final attemptCancellation = AiCancellationToken();
+      cancellation.whenCancelled.then((_) => attemptCancellation.cancel());
       try {
         final request = http.AbortableRequest(
           'POST',
           config.chatCompletionsUri,
-          abortTrigger: cancellation.whenCancelled,
+          abortTrigger: attemptCancellation.whenCancelled,
         )
           ..headers.addAll({
             'content-type': 'application/json',
@@ -175,33 +166,42 @@ class OpenAiCompatibleAiClient implements AiClient {
             'stream': streaming,
           });
 
-        final pending = _httpClient.send(request);
         final response = await Future.any<http.StreamedResponse>([
-          pending,
-          cancellation.whenCancelled.then<http.StreamedResponse>(
+          _httpClient.send(request),
+          attemptCancellation.whenCancelled.then<http.StreamedResponse>(
             (_) => throw AiException.cancelled(),
           ),
-        ]).timeout(config.timeout);
+        ]).timeout(
+          config.timeout,
+          onTimeout: () {
+            attemptCancellation.cancel();
+            throw TimeoutException('AI request timed out.');
+          },
+        );
 
         final retryableStatus =
             response.statusCode == 429 || response.statusCode >= 500;
         if (retryableStatus && attempt < config.maxRetries) {
+          attemptCancellation.cancel();
           await response.stream.listen(null).cancel();
           await _waitBeforeRetry(attempt, cancellation);
           continue;
         }
-        return response;
+        return _AiHttpResponse(response, attemptCancellation);
       } on AiException {
         rethrow;
       } on TimeoutException {
+        attemptCancellation.cancel();
         if (cancellation.isCancelled) throw AiException.cancelled();
         if (attempt >= config.maxRetries) throw AiException.timeout();
         await _waitBeforeRetry(attempt, cancellation);
       } on http.ClientException {
+        attemptCancellation.cancel();
         if (cancellation.isCancelled) throw AiException.cancelled();
         if (attempt >= config.maxRetries) throw AiException.network();
         await _waitBeforeRetry(attempt, cancellation);
       } catch (_) {
+        attemptCancellation.cancel();
         if (cancellation.isCancelled) throw AiException.cancelled();
         if (attempt >= config.maxRetries) throw AiException.network();
         await _waitBeforeRetry(attempt, cancellation);
@@ -214,9 +214,8 @@ class OpenAiCompatibleAiClient implements AiClient {
     AiCancellationToken cancellation,
   ) async {
     cancellation.throwIfCancelled();
-    final multiplier = 1 << attempt;
     final milliseconds =
-        config.retryBaseDelay.inMilliseconds * multiplier;
+        config.retryBaseDelay.inMilliseconds * (1 << attempt);
     final delay = Duration(
       milliseconds: milliseconds.clamp(
         1,
@@ -233,18 +232,32 @@ class OpenAiCompatibleAiClient implements AiClient {
 
   Future<String> _readBody(
     http.StreamedResponse response,
-    AiCancellationToken? cancellationToken,
+    AiCancellationToken cancellation,
   ) async {
-    final stream = response.stream.transform(utf8.decoder);
-    if (cancellationToken == null) {
-      return stream.join().timeout(config.timeout);
+    try {
+      return await Future.any<String>([
+        response.stream.transform(utf8.decoder).join(),
+        cancellation.whenCancelled.then<String>(
+          (_) => throw AiException.cancelled(),
+        ),
+      ]).timeout(
+        config.timeout,
+        onTimeout: () {
+          cancellation.cancel();
+          throw TimeoutException('AI response body timed out.');
+        },
+      );
+    } on AiException {
+      rethrow;
+    } on TimeoutException {
+      throw AiException.timeout();
+    } on http.ClientException {
+      if (cancellation.isCancelled) throw AiException.cancelled();
+      throw AiException.network();
+    } catch (_) {
+      if (cancellation.isCancelled) throw AiException.cancelled();
+      throw AiException.network();
     }
-    return Future.any<String>([
-      stream.join().timeout(config.timeout),
-      cancellationToken.whenCancelled.then<String>(
-        (_) => throw AiException.cancelled(),
-      ),
-    ]);
   }
 
   Stream<String> _decodeEvents(
@@ -281,7 +294,7 @@ class OpenAiCompatibleAiClient implements AiClient {
     } on AiException {
       rethrow;
     } on TimeoutException {
-      if (cancellation.isCancelled) throw AiException.cancelled();
+      cancellation.cancel();
       throw AiException.timeout();
     } on FormatException {
       throw AiException.invalidResponse();
@@ -340,4 +353,11 @@ class OpenAiCompatibleAiClient implements AiClient {
   void close() {
     if (_ownsHttpClient) _httpClient.close();
   }
+}
+
+class _AiHttpResponse {
+  const _AiHttpResponse(this.response, this.cancellation);
+
+  final http.StreamedResponse response;
+  final AiCancellationToken cancellation;
 }
