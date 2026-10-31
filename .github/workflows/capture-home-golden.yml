@@ -1,0 +1,38 @@
+name: Capture Home Golden
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/capture-home-golden.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          flutter-version: '3.47.8'
+          channel: stable
+          cache: true
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Generate home golden baseline
+        run: flutter test --update-goldens test/features/home/home_page_golden_test.dart
+
+      - name: Upload golden baseline
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: home-page-golden
+          path: test/features/home/goldens/home_page.png
+          if-no-files-found: error
