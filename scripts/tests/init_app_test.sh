@@ -13,8 +13,9 @@ bash -n "$FIXTURE/scripts/init_app.sh"
 printf 'name: universal_app\n' > "$FIXTURE/pubspec.yaml"
 cat > "$FIXTURE/docs/APP_SPEC.md" <<'EOF'
 ## Identity
-- App name:
-- Android application ID:
+- App name: Universal App
+- Dart package name: universal_app
+- Android application ID: com.example.universal_app
 EOF
 printf "const title = 'Universal App';\n" > "$FIXTURE/lib/app.dart"
 printf "const label = 'Universal App';\n" > "$FIXTURE/lib/features/home/presentation/home_page.dart"
