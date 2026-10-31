@@ -21,9 +21,11 @@ class _HangingStreamClient extends http.BaseClient {
     body.add(
       utf8.encode('data: {"choices":[{"delta":{"content":"first"}}]}\n\n'),
     );
-    abortable.abortTrigger?.then((_) {
-      if (!body.isClosed) body.close();
-    });
+    unawaited(
+      abortable.abortTrigger?.then((_) {
+        if (!body.isClosed) body.close();
+      }),
+    );
     return http.StreamedResponse(body.stream, 200, request: request);
   }
 
