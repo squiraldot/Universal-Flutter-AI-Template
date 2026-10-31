@@ -53,7 +53,10 @@ void main() {
         'https://',
       ]) {
         expect(
-          () => AppEnvironment.fromValues(name: 'development', apiBaseUrl: value),
+          () => AppEnvironment.fromValues(
+            name: 'development',
+            apiBaseUrl: value,
+          ),
           throwsFormatException,
           reason: 'Expected $value to be rejected',
         );
