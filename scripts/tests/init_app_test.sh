@@ -63,9 +63,19 @@ grep -q 'package com.squiraldot.lifebit' "$FIXTURE/android/app/src/main/kotlin/c
 test ! -e "$FIXTURE/android/app/src/main/kotlin/com/example/universal_app/MainActivity.kt"
 
 # A second run with identical inputs must not change any bytes.
-before="$(find "$FIXTURE" -type f -print0 | sort -z | xargs -0 sha256sum)"
+before="$(python3 - "$FIXTURE" <<'PY'
+import hashlib, pathlib, sys
+root = pathlib.Path(sys.argv[1])
+print("\\n".join(f"{p.relative_to(root)}:{hashlib.sha256(p.read_bytes()).hexdigest()}" for p in sorted(root.rglob("*")) if p.is_file()))
+PY
+)"
 bash "$FIXTURE/scripts/init_app.sh" "Lifebit" lifebit com.squiraldot.lifebit >/dev/null
-after="$(find "$FIXTURE" -type f -print0 | sort -z | xargs -0 sha256sum)"
+after="$(python3 - "$FIXTURE" <<'PY'
+import hashlib, pathlib, sys
+root = pathlib.Path(sys.argv[1])
+print("\\n".join(f"{p.relative_to(root)}:{hashlib.sha256(p.read_bytes()).hexdigest()}" for p in sorted(root.rglob("*")) if p.is_file()))
+PY
+)"
 test "$before" = "$after"
 
 echo "init_app.sh tests passed (validation, dry-run, updates, package move, idempotence)."
