@@ -1,0 +1,9 @@
+---
+description: Repository-wide instructions are maintained in AGENTS.md.
+alwaysApply: true
+---
+
+Read and follow [AGENTS.md](../../AGENTS.md) before making changes. It is the
+single source of truth for repository-wide agent instructions. Do not duplicate
+its rules in Cursor configuration. Also consult the relevant approved
+specifications under `docs/` as directed there.
