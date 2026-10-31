@@ -2,6 +2,7 @@
 
 ## Identity
 - App name:
+- Dart package name:
 - Android application ID:
 - One-sentence summary:
 - Target users:
