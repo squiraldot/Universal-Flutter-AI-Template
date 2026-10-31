@@ -114,7 +114,7 @@ class OpenAiCompatibleAiClient implements AiClient {
         controller.add(chunk);
       }
     } catch (error, stackTrace) {
-      if (!controller.isClosed) {
+      if (controller.hasListener && !controller.isClosed) {
         controller.addError(error, stackTrace);
       }
     } finally {
