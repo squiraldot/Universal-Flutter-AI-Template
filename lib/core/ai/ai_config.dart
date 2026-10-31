@@ -40,8 +40,7 @@ class AiConfig {
         'Retries must be between zero and five.',
       );
     }
-    if (retryBaseDelay <= Duration.zero ||
-        maxRetryDelay < retryBaseDelay) {
+    if (retryBaseDelay <= Duration.zero || maxRetryDelay < retryBaseDelay) {
       throw ArgumentError('Retry delays must be positive and bounded.');
     }
   }
