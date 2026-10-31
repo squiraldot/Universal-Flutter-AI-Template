@@ -19,11 +19,12 @@ It is intentionally app-agnostic. It does not prescribe a chat app, a particular
 
 1. Create a repository from this template (or copy it into a new app repository).
 2. Read `AGENTS.md` and the documentation listed in `docs/INDEX.md`.
-3. Define the target app in `docs/APP_SPEC.md`: goals, users, MVP journeys, data, integrations, constraints and out-of-scope features.
+3. Define the target app in `docs/APP_SPEC.md`.
 4. Initialize the pinned Flutter SDK submodule: `git submodule update --init --recursive`.
-5. Bootstrap the project with `bash scripts/bootstrap.sh` after installing the required JDK and Android SDK.
-6. Implement only the approved scope, keeping architecture decisions documented.
-7. Run formatting, analysis, tests and a debug APK build; then review the GitHub Actions results before merging.
+5. Generate the Android scaffold with `bash scripts/bootstrap.sh`.
+6. Initialize the app identity with `bash scripts/init_app.sh "<App Name>" <dart_package_name> <android.applicationId>`.
+7. Implement only the approved scope, keeping architecture decisions documented.
+8. Run formatting, analysis, tests and a debug APK build; review GitHub Actions before merging.
 
 ## What this template provides
 
@@ -41,17 +42,39 @@ No folder structure can guarantee zero issues for every app. This template reduc
 ## First setup
 
 1. Create a repository from this template or copy it into a new app repository.
-2. Fill `docs/APP_SPEC.md`.
-3. Initialize submodules: `git submodule update --init --recursive`.
-4. Run `bash scripts/bootstrap.sh` with JDK and Android SDK installed.
+2. Initialize submodules: `git submodule update --init --recursive`.
+3. Run `bash scripts/bootstrap.sh` with JDK and Android SDK installed.
+4. Initialize the app identity using the script below.
 5. Review and commit generated Android files and `pubspec.lock`.
 6. Push to GitHub and inspect CI/APK workflow results.
+
+## Initialize a new app
+
+After `scripts/bootstrap.sh` has generated the Android project, run:
+
+```bash
+bash scripts/init_app.sh "Lifebit" lifebit com.squiraldot.lifebit
+```
+
+The three arguments are the human-readable app name (1–50 characters), lowercase Dart package name, and reverse-domain Android application ID.
+
+Preview all planned changes without writing files:
+
+```bash
+bash scripts/init_app.sh --dry-run "Lifebit" lifebit com.squiraldot.lifebit
+```
+
+The script updates `pubspec.yaml`, Dart package imports, starter app titles and widget-test expectations, `docs/APP_SPEC.md`, Android Gradle namespace/application ID, launcher label, and the `MainActivity` package/path. It validates expected files and patterns before writing, refuses ambiguous Android configurations, and is safe to rerun with the same values. It does not run `flutter pub get`; run that after initialization to refresh the lockfile.
+
+The Android scaffold must exist first. Changing an application ID later may also require separate updates to store listings, signing/release configuration and external service registrations.
 
 ## Commands
 
 ```bash
 git submodule update --init --recursive
 bash scripts/bootstrap.sh
+bash scripts/init_app.sh --dry-run "My App" my_app com.example.my_app
+bash scripts/init_app.sh "My App" my_app com.example.my_app
 third_party/flutter/bin/dart format lib test
 third_party/flutter/bin/flutter analyze
 third_party/flutter/bin/flutter test
