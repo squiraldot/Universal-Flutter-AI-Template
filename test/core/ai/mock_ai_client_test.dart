@@ -10,10 +10,7 @@ void main() {
 
     expect(client, isA<AiClient>());
     expect(await client.complete('hello'), 'Mock response: hello');
-    expect(await client.stream('hello').toList(), [
-      'Mock ',
-      'stream: hello',
-    ]);
+    expect(await client.stream('hello').toList(), ['Mock ', 'stream: hello']);
     expect(client.prompts, ['hello', 'hello']);
 
     client.close();
