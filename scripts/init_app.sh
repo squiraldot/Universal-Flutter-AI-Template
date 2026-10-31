@@ -23,7 +23,7 @@ from xml.sax.saxutils import escape as xml_escape
 root = Path(os.environ["INIT_APP_ROOT"])
 app, package, app_id = (os.environ[k] for k in ("INIT_APP_NAME","INIT_DART_PACKAGE","INIT_ANDROID_ID"))
 dry = os.environ["INIT_DRY_RUN"] == "true"
-if any(ord(ch) < 32 or ord(ch) == 127 for ch in app): raise ValueError("App name cannot contain control characters.")
+if not app.strip() or any(ord(ch) < 32 or ord(ch) == 127 for ch in app): raise ValueError("App name must be non-blank and cannot contain control characters.")
 dart_app = app.replace("\\", "\\\\").replace("'", "\\'").replace("$", "\\$")
 xml_app = xml_escape(app, {'"': "&quot;"})
 pubspec=root/"pubspec.yaml"; spec_file=root/"docs/APP_SPEC.md"
