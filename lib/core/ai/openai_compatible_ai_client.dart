@@ -3,17 +3,22 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import 'ai_cancellation_token.dart';
+import 'ai_client.dart';
 import 'ai_config.dart';
 import 'ai_exception.dart';
 
 /// Supplies a short-lived access token at request time.
 ///
-/// Implement this with a secure backend/session flow. Do not hardcode API
-/// keys in the Flutter application or ship provider secrets in the APK.
+/// Implement this with a secure backend/session flow. Never ship provider
+/// secrets in the Flutter application or its APK.
 typedef AiTokenProvider = Future<String?> Function();
 
-/// Minimal client for APIs implementing the OpenAI chat-completions format.
-class OpenAiCompatibleAiClient {
+/// HTTP adapter for APIs implementing the OpenAI chat-completions format.
+///
+/// The public contract is [AiClient], so app features can replace this adapter
+/// without depending on a provider-specific implementation.
+class OpenAiCompatibleAiClient implements AiClient {
   OpenAiCompatibleAiClient({
     required this.config,
     required this.tokenProvider,
@@ -26,53 +31,24 @@ class OpenAiCompatibleAiClient {
   final http.Client _httpClient;
   final bool _ownsHttpClient;
 
-  /// Sends a user prompt and returns the assistant's text response.
-  ///
-  /// This intentionally exposes only the small text-chat surface needed by
-  /// many apps. Provider-specific features can be added behind this boundary.
-  Future<String> complete(String prompt) async {
-    if (prompt.trim().isEmpty) {
-      throw ArgumentError.value(prompt, 'prompt', 'Prompt must not be empty.');
-    }
-
-    final token = (await tokenProvider())?.trim();
-    if (token == null || token.isEmpty) {
-      throw AiException.missingCredentials();
-    }
-
-    late final http.Response response;
-    try {
-      response = await _httpClient
-          .post(
-            config.chatCompletionsUri,
-            headers: <String, String>{
-              'content-type': 'application/json',
-              'authorization': 'Bearer $token',
-            },
-            body: jsonEncode(<String, Object>{
-              'model': config.model,
-              'messages': <Map<String, String>>[
-                <String, String>{'role': 'user', 'content': prompt.trim()},
-              ],
-            }),
-          )
-          .timeout(config.timeout);
-    } on TimeoutException {
-      throw AiException.timeout();
-    } on http.ClientException {
-      throw AiException.network();
-    }
-
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      // Do not surface raw provider bodies; they may contain sensitive data.
-      throw AiException(
-        'The AI service request failed.',
-        statusCode: response.statusCode,
-      );
-    }
+  @override
+  Future<String> complete(
+    String prompt, {
+    AiCancellationToken? cancellationToken,
+  }) async {
+    _validatePrompt(prompt);
+    final token = await _getToken(cancellationToken);
+    final response = await _sendWithRetries(
+      prompt: prompt.trim(),
+      token: token,
+      cancellationToken: cancellationToken,
+      streaming: false,
+    );
+    _throwForStatus(response.statusCode);
 
     try {
-      final decoded = jsonDecode(response.body);
+      final body = await _readBody(response, cancellationToken);
+      final decoded = jsonDecode(body);
       if (decoded is! Map<String, dynamic>) {
         throw const FormatException('Expected a JSON object.');
       }
@@ -93,15 +69,267 @@ class OpenAiCompatibleAiClient {
         throw const FormatException('Missing text content.');
       }
       return content.trim();
+    } on AiException {
+      rethrow;
     } on FormatException {
       throw AiException.invalidResponse();
+    } on TimeoutException {
+      if (cancellationToken?.isCancelled ?? false) {
+        throw AiException.cancelled();
+      }
+      throw AiException.timeout();
+    } on http.ClientException {
+      if (cancellationToken?.isCancelled ?? false) {
+        throw AiException.cancelled();
+      }
+      throw AiException.network();
     }
   }
 
-  /// Closes the underlying client only when this class created it.
-  void close() {
-    if (_ownsHttpClient) {
-      _httpClient.close();
+  @override
+  Stream<String> stream(
+    String prompt, {
+    AiCancellationToken? cancellationToken,
+  }) async* {
+    _validatePrompt(prompt);
+    final token = cancellationToken ?? AiCancellationToken();
+    var completed = false;
+    try {
+      final accessToken = await _getToken(token);
+      final response = await _sendWithRetries(
+        prompt: prompt.trim(),
+        token: accessToken,
+        cancellationToken: token,
+        streaming: true,
+      );
+      _throwForStatus(response.statusCode);
+      yield* _decodeEvents(response, token);
+      completed = true;
+    } on AiException {
+      rethrow;
+    } on TimeoutException {
+      if (token.isCancelled) throw AiException.cancelled();
+      throw AiException.timeout();
+    } on http.ClientException {
+      if (token.isCancelled) throw AiException.cancelled();
+      throw AiException.network();
+    } finally {
+      // Also aborts the HTTP request when a consumer cancels its subscription.
+      if (!completed) token.cancel();
     }
+  }
+
+  Future<String> _getToken(AiCancellationToken? cancellationToken) async {
+    final token = cancellationToken ?? AiCancellationToken();
+    token.throwIfCancelled();
+    try {
+      final value = await Future.any<String?>([
+        tokenProvider(),
+        token.whenCancelled.then<String?>((_) => throw AiException.cancelled()),
+      ]).timeout(config.timeout);
+      final normalized = value?.trim();
+      if (normalized == null || normalized.isEmpty) {
+        throw AiException.missingCredentials();
+      }
+      return normalized;
+    } on AiException {
+      rethrow;
+    } on TimeoutException {
+      if (token.isCancelled) throw AiException.cancelled();
+      throw AiException.timeout();
+    } catch (_) {
+      if (token.isCancelled) throw AiException.cancelled();
+      throw AiException.network();
+    }
+  }
+
+  Future<http.StreamedResponse> _sendWithRetries({
+    required String prompt,
+    required String token,
+    required AiCancellationToken? cancellationToken,
+    required bool streaming,
+  }) async {
+    final cancellation = cancellationToken ?? AiCancellationToken();
+    for (var attempt = 0; ; attempt++) {
+      cancellation.throwIfCancelled();
+      try {
+        final request = http.AbortableRequest(
+          'POST',
+          config.chatCompletionsUri,
+          abortTrigger: cancellation.whenCancelled,
+        )
+          ..headers.addAll({
+            'content-type': 'application/json',
+            'authorization': 'Bearer $token',
+          })
+          ..body = jsonEncode({
+            'model': config.model,
+            'messages': [
+              {'role': 'user', 'content': prompt},
+            ],
+            'stream': streaming,
+          });
+
+        final pending = _httpClient.send(request);
+        final response = await Future.any<http.StreamedResponse>([
+          pending,
+          cancellation.whenCancelled.then<http.StreamedResponse>(
+            (_) => throw AiException.cancelled(),
+          ),
+        ]).timeout(config.timeout);
+
+        final retryableStatus =
+            response.statusCode == 429 || response.statusCode >= 500;
+        if (retryableStatus && attempt < config.maxRetries) {
+          await response.stream.listen(null).cancel();
+          await _waitBeforeRetry(attempt, cancellation);
+          continue;
+        }
+        return response;
+      } on AiException {
+        rethrow;
+      } on TimeoutException {
+        if (cancellation.isCancelled) throw AiException.cancelled();
+        if (attempt >= config.maxRetries) throw AiException.timeout();
+        await _waitBeforeRetry(attempt, cancellation);
+      } on http.ClientException {
+        if (cancellation.isCancelled) throw AiException.cancelled();
+        if (attempt >= config.maxRetries) throw AiException.network();
+        await _waitBeforeRetry(attempt, cancellation);
+      } catch (_) {
+        if (cancellation.isCancelled) throw AiException.cancelled();
+        if (attempt >= config.maxRetries) throw AiException.network();
+        await _waitBeforeRetry(attempt, cancellation);
+      }
+    }
+  }
+
+  Future<void> _waitBeforeRetry(
+    int attempt,
+    AiCancellationToken cancellation,
+  ) async {
+    cancellation.throwIfCancelled();
+    final multiplier = 1 << attempt;
+    final milliseconds =
+        config.retryBaseDelay.inMilliseconds * multiplier;
+    final delay = Duration(
+      milliseconds: milliseconds.clamp(
+        1,
+        config.maxRetryDelay.inMilliseconds,
+      ),
+    );
+    await Future.any<void>([
+      Future<void>.delayed(delay),
+      cancellation.whenCancelled.then<void>(
+        (_) => throw AiException.cancelled(),
+      ),
+    ]);
+  }
+
+  Future<String> _readBody(
+    http.StreamedResponse response,
+    AiCancellationToken? cancellationToken,
+  ) async {
+    final stream = response.stream.transform(utf8.decoder);
+    if (cancellationToken == null) {
+      return stream.join().timeout(config.timeout);
+    }
+    return Future.any<String>([
+      stream.join().timeout(config.timeout),
+      cancellationToken.whenCancelled.then<String>(
+        (_) => throw AiException.cancelled(),
+      ),
+    ]);
+  }
+
+  Stream<String> _decodeEvents(
+    http.StreamedResponse response,
+    AiCancellationToken cancellation,
+  ) async* {
+    final dataLines = <String>[];
+    try {
+      await for (final line
+          in response.stream
+              .transform(utf8.decoder)
+              .transform(const LineSplitter())
+              .timeout(config.timeout)) {
+        cancellation.throwIfCancelled();
+        if (line.isEmpty) {
+          final data = dataLines.join('\n');
+          dataLines.clear();
+          if (data == '[DONE]') return;
+          if (data.isNotEmpty) {
+            final text = _extractDelta(data);
+            if (text != null && text.isNotEmpty) yield text;
+          }
+        } else if (line.startsWith('data:')) {
+          dataLines.add(line.substring(5).trimLeft());
+        }
+      }
+      if (dataLines.isNotEmpty) {
+        final data = dataLines.join('\n');
+        if (data != '[DONE]') {
+          final text = _extractDelta(data);
+          if (text != null && text.isNotEmpty) yield text;
+        }
+      }
+    } on AiException {
+      rethrow;
+    } on TimeoutException {
+      if (cancellation.isCancelled) throw AiException.cancelled();
+      throw AiException.timeout();
+    } on FormatException {
+      throw AiException.invalidResponse();
+    } on http.ClientException {
+      if (cancellation.isCancelled) throw AiException.cancelled();
+      throw AiException.network();
+    }
+  }
+
+  String? _extractDelta(String data) {
+    final decoded = jsonDecode(data);
+    if (decoded is! Map<String, dynamic>) {
+      throw const FormatException('Expected an event object.');
+    }
+    final choices = decoded['choices'];
+    if (choices is! List || choices.isEmpty) return null;
+    final first = choices.first;
+    if (first is! Map<String, dynamic>) {
+      throw const FormatException('Invalid stream choice.');
+    }
+    final delta = first['delta'];
+    if (delta is! Map<String, dynamic>) return null;
+    final content = delta['content'];
+    if (content == null) return null;
+    if (content is! String) {
+      throw const FormatException('Invalid stream content.');
+    }
+    return content;
+  }
+
+  void _throwForStatus(int statusCode) {
+    if (statusCode >= 200 && statusCode < 300) return;
+    if (statusCode == 401 || statusCode == 403) {
+      throw AiException(
+        'The AI service rejected the supplied credentials.',
+        statusCode: statusCode,
+        type: AiErrorType.authentication,
+      );
+    }
+    if (statusCode == 429) {
+      throw AiException.rateLimit(statusCode: statusCode);
+    }
+    throw AiException.network(statusCode: statusCode);
+  }
+
+  void _validatePrompt(String prompt) {
+    if (prompt.trim().isEmpty) {
+      throw ArgumentError.value(prompt, 'prompt', 'Prompt must not be empty.');
+    }
+  }
+
+  @override
+  void close() {
+    if (_ownsHttpClient) _httpClient.close();
   }
 }
