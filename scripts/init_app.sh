@@ -53,7 +53,7 @@ if re.search(r"(?m)^- Dart package name:",spec):
 else: spec=spec.replace(f"- App name: {app}\n",f"- App name: {app}\n- Dart package name: {package}\n",1)
 changes[spec_file]=once(spec,r"(?m)^- Android application ID:\s*.*$",f"- Android application ID: {app_id}","APP_SPEC Android ID")
 for p in sorted([*(root/"lib").rglob("*.dart"),*tests.rglob("*.dart")]):
- s=read(p); updated=s.replace("Universal App",app).replace(f"package:{old_package}/",f"package:{package}/")
+ s=read(p); updated=s.replace("Universal App",dart_app).replace(f"package:{old_package}/",f"package:{package}/")
  if updated!=s: changes[p]=updated
 gradle=gradles[0]; gs=read(gradle)
 for key in ("namespace","applicationId"):
