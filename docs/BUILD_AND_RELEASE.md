@@ -50,10 +50,10 @@ These files configure Dart compile-time values only. They do not create native A
 ## Build commands
 
 ```bash
-third_party/flutter/bin/flutter build apk --debug
+third_party/flutter/bin/flutter build apk --debug --dart-define-from-file=config/development.json
 # Run on macOS with Xcode installed:
-third_party/flutter/bin/flutter build ios --no-codesign
-third_party/flutter/bin/flutter build web --release
+third_party/flutter/bin/flutter build ios --no-codesign --dart-define-from-file=config/production.json
+third_party/flutter/bin/flutter build web --release --dart-define-from-file=config/production.json
 ```
 
 The Web output is written to `build/web`. Configure the hosting provider to serve this directory and route unknown paths to `index.html` when using path-based client-side routing.

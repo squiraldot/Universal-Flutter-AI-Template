@@ -132,9 +132,9 @@ third_party/flutter/bin/dart format lib test
 third_party/flutter/bin/flutter analyze
 third_party/flutter/bin/flutter test --coverage
 bash scripts/check_coverage.sh
-third_party/flutter/bin/flutter build apk --debug
-third_party/flutter/bin/flutter build ios --no-codesign  # macOS + Xcode only
-third_party/flutter/bin/flutter build web --release
+third_party/flutter/bin/flutter build apk --debug --dart-define-from-file=config/development.json
+third_party/flutter/bin/flutter build ios --no-codesign --dart-define-from-file=config/production.json  # macOS + Xcode only
+third_party/flutter/bin/flutter build web --release --dart-define-from-file=config/production.json
 ```
 
 Read `AGENTS.md` and relevant docs before coding. Never commit secrets, signing keys, service-account files or production user data.

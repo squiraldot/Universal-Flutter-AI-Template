@@ -25,10 +25,10 @@ third_party/flutter/bin/dart format --output=none --set-exit-if-changed lib test
 third_party/flutter/bin/flutter analyze
 third_party/flutter/bin/flutter test --coverage
 bash scripts/check_coverage.sh
-third_party/flutter/bin/flutter build apk --debug
-third_party/flutter/bin/flutter build web --release
+third_party/flutter/bin/flutter build apk --debug --dart-define-from-file=config/development.json
+third_party/flutter/bin/flutter build web --release --dart-define-from-file=config/production.json
 # macOS + Xcode only:
-third_party/flutter/bin/flutter build ios --no-codesign
+third_party/flutter/bin/flutter build ios --no-codesign --dart-define-from-file=config/production.json
 ```
 
 Flutter CI enforces a minimum of 80% Dart line coverage for handwritten library files represented in LCOV. Generated localization code under `lib/l10n/generated/` is excluded because it is tool-generated. Platform build jobs compile Android and Web on Linux and iOS without code signing on macOS.
