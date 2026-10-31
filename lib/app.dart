@@ -14,7 +14,7 @@ class UniversalApp extends ConsumerWidget {
     final environment = ref.watch(appEnvironmentProvider);
 
     return MaterialApp.router(
-      title: 'Universal App (' + environment.name.name + ')',
+      title: 'Universal App (${environment.name.name})',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
