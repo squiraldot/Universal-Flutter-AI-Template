@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
 
 abstract final class AppTheme {
-  static ThemeData light() {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF65C466),
-      brightness: Brightness.light,
-    );
-    return ThemeData(useMaterial3: true, colorScheme: scheme);
-  }
+  static const Color seedColor = Color(0xFF65C466);
 
-  static ThemeData dark() {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF65C466),
-      brightness: Brightness.dark,
+  static ThemeData light() => _buildTheme(Brightness.light);
+
+  static ThemeData dark() => _buildTheme(Brightness.dark);
+
+  static ThemeData _buildTheme(Brightness brightness) {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: seedColor,
+      brightness: brightness,
     );
-    return ThemeData(useMaterial3: true, colorScheme: scheme);
+    final typography = Typography.material2021();
+
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: colorScheme,
+      textTheme: brightness == Brightness.light
+          ? typography.black
+          : typography.white,
+    );
   }
 }
