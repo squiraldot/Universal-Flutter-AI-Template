@@ -79,10 +79,24 @@ class OpenAiCompatibleAiClient implements AiClient {
   Stream<String> stream(
     String prompt, {
     AiCancellationToken? cancellationToken,
-  }) async* {
+  }) {
     _validatePrompt(prompt);
     final cancellation = _operationToken(cancellationToken);
-    var completed = false;
+    late final StreamController<String> controller;
+    controller = StreamController<String>(
+      onListen: () {
+        unawaited(_runStream(prompt, cancellation, controller));
+      },
+      onCancel: cancellation.cancel,
+    );
+    return controller.stream;
+  }
+
+  Future<void> _runStream(
+    String prompt,
+    AiCancellationToken cancellation,
+    StreamController<String> controller,
+  ) async {
     try {
       final accessToken = await _getToken(cancellation);
       final result = await _sendWithRetries(
@@ -92,11 +106,23 @@ class OpenAiCompatibleAiClient implements AiClient {
         streaming: true,
       );
       _throwForStatus(result);
-      yield* _decodeEvents(result.response, result.cancellation);
-      completed = true;
+      await for (final chunk in _decodeEvents(
+        result.response,
+        result.cancellation,
+      )) {
+        if (controller.isClosed) return;
+        controller.add(chunk);
+      }
+    } catch (error, stackTrace) {
+      if (!controller.isClosed) {
+        controller.addError(error, stackTrace);
+      }
     } finally {
-      // A cancelled consumer stops the source subscription and HTTP request.
-      if (!completed) cancellation.cancel();
+      if (!controller.isClosed) {
+        await controller.close();
+      } else {
+        cancellation.cancel();
+      }
     }
   }
 
