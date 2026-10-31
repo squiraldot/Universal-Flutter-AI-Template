@@ -10,6 +10,27 @@ import 'package:universal_app/core/ai/ai_config.dart';
 import 'package:universal_app/core/ai/ai_exception.dart';
 import 'package:universal_app/core/ai/openai_compatible_ai_client.dart';
 
+class _HangingStreamClient extends http.BaseClient {
+  Future<void>? abortTrigger;
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    final abortable = request as http.AbortableRequest;
+    abortTrigger = abortable.abortTrigger;
+    final body = StreamController<List<int>>();
+    body.add(
+      utf8.encode('data: {"choices":[{"delta":{"content":"first"}}]}\\n\\n'),
+    );
+    abortable.abortTrigger?.then((_) {
+      if (!body.isClosed) body.close();
+    });
+    return http.StreamedResponse(body.stream, 200, request: request);
+  }
+
+  @override
+  void close() {}
+}
+
 void main() {
   AiConfig config({
     Duration timeout = const Duration(seconds: 1),
@@ -301,27 +322,21 @@ void main() {
   });
   test('cancelling a stream subscription aborts its HTTP request', () async {
     final firstChunk = Completer<String>();
-    Future<void>? abortTrigger;
+    final transport = _HangingStreamClient();
     final client = OpenAiCompatibleAiClient(
       config: config(),
       tokenProvider: () async => 'token',
-      httpClient: MockClient((request) async {
-        expect(request, isA<http.AbortableRequest>());
-        abortTrigger = (request as http.AbortableRequest).abortTrigger;
-        return http.Response(
-          'data: {"choices":[{"delta":{"content":"first"}}]}\\n\\n'
-          'data: {"choices":[{"delta":{"content":"second"}}]}\\n\\n',
-          200,
-        );
-      }),
+      httpClient: transport,
     );
 
-    final subscription = client.stream('Hello').listen(firstChunk.complete);
+    final subscription = client.stream('Hello').listen((chunk) {
+      if (!firstChunk.isCompleted) firstChunk.complete(chunk);
+    });
     expect(await firstChunk.future, 'first');
     await subscription.cancel();
 
-    expect(abortTrigger, isNotNull);
-    await expectLater(abortTrigger!, completes);
+    expect(transport.abortTrigger, isNotNull);
+    await expectLater(transport.abortTrigger!, completes);
     client.close();
   });
 
