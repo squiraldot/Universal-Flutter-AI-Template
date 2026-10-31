@@ -70,6 +70,19 @@ Run the script's fixture-based safety checks with `bash scripts/tests/init_app_t
 
 The Android scaffold must exist first. Changing an application ID later may also require separate updates to store listings, signing/release configuration and external service registrations.
 
+## Initialize from GitHub Actions
+
+You can initialize a fresh app without running the scripts locally:
+
+1. Open the repository's **Actions** tab and select **Initialize New App**.
+2. Choose **Run workflow** and enter the app name, Dart package name and Android application ID.
+3. Leave **Dry run** unchecked to generate the Android scaffold, apply the identity, run initializer tests, formatting, analysis and Flutter tests, then build a debug APK.
+4. Open the completed workflow run's **Artifacts** section.
+
+A dry run uploads only the initialization preview. A full run uploads two separate artifacts: the initialized source archive (including generated Android files and the refreshed lockfile) and the debug APK. The workflow does not commit generated files back to the template repository; download the source artifact and use it as the starting point for your new app repository.
+
+The workflow runs on a clean GitHub-hosted Ubuntu runner and uses the Flutter version configured by this template's CI. It requires no repository secrets.
+
 ## Commands
 
 ```bash
