@@ -26,6 +26,7 @@
 **Files:**
 - Create: `lib/core/theme/app_tokens.dart`
 - Modify: `lib/core/theme/app_theme.dart`
+- Modify: `lib/features/home/presentation/home_page.dart` to consume spacing tokens
 - Create: `test/core/theme/app_theme_test.dart`
 
 **Interfaces:**
@@ -33,9 +34,9 @@
 - `abstract final class AppRadii` exposes immutable named radius constants (4, 8, 12, 16 logical pixels).
 - `AppTheme.light()` and `AppTheme.dark()` remain the public theme factories and continue using the existing green seed `0xFF65C466`.
 
-- [ ] **Step 1: Add focused tests** for Material 3 enabled, matching seed-derived primary color across brightnesses, and non-null shared typography/color schemes.
+- [x] **Step 1: Add focused tests** for Material 3 enabled, matching seed-derived primary color across brightnesses, and non-null shared typography/color schemes.
 - [ ] **Step 2: Verify RED** by running `third_party/flutter/bin/flutter test test/core/theme/app_theme_test.dart`; the token import/expectations should fail before implementation.
-- [ ] **Step 3: Implement** immutable spacing/radius tokens and refactor theme construction to share the seed and typography configuration while retaining brightness-specific ColorSchemes.
+- [x] **Step 3: Implement** immutable spacing/radius tokens and refactor theme construction to share the seed and typography configuration while retaining brightness-specific ColorSchemes.
 - [ ] **Step 4: Verify GREEN** with the focused test command.
 - [ ] **Step 5: Run integration check** using `third_party/flutter/bin/flutter test`; existing home launch behavior remains unchanged.
 - [ ] **Step 6: Commit** the passing task as `feat(theme): add shared app design tokens`.
@@ -52,9 +53,9 @@
 - `sealed class Result<T>` has `Success<T>(T value)` and `Failure<T>(AppError error)`.
 - Result variants expose their payloads; no exception-catching helper or forced conversion of all functions is added.
 
-- [ ] **Step 1: Add focused tests** for success retaining its value, failure retaining its typed error, and AppError retaining code/message/optional diagnostics.
+- [x] **Step 1: Add focused tests** for success retaining its value, failure retaining its typed error, and AppError retaining code/message/optional diagnostics.
 - [ ] **Step 2: Verify RED** with `third_party/flutter/bin/flutter test test/core/errors/result_test.dart`; tests should fail because the types do not exist.
-- [ ] **Step 3: Implement** the minimal sealed hierarchy and immutable error value object. Technical cause/stack trace remain diagnostic-only and are not included in the safe message by default.
+- [x] **Step 3: Implement** the minimal sealed hierarchy and immutable error value object. Technical cause/stack trace remain diagnostic-only and are not included in the safe message by default.
 - [ ] **Step 4: Verify GREEN** with the focused test command.
 - [ ] **Step 5: Run integration check** using `third_party/flutter/bin/flutter analyze` and `third_party/flutter/bin/flutter test`.
 - [ ] **Step 6: Commit** the passing task as `feat(core): add typed result and app errors`.
@@ -70,9 +71,9 @@
 - `DeveloperAppLogger` implements the interface with `dart:developer` and accepts an injectable sink for deterministic tests.
 - The logging contract has no arbitrary context-map or payload parameter.
 
-- [ ] **Step 1: Add focused tests** using a fake sink to assert each level, scope, error object, and stack trace are forwarded with the expected diagnostic level.
+- [x] **Step 1: Add focused tests** using a fake sink to assert each level, scope, error object, and stack trace are forwarded with the expected diagnostic level.
 - [ ] **Step 2: Verify RED** with `third_party/flutter/bin/flutter test test/core/logging/app_logger_test.dart`.
-- [ ] **Step 3: Implement** the interface and default developer-log adapter. Keep sensitive data out of the API and document that callers must not embed sensitive values in messages.
+- [x] **Step 3: Implement** the interface and default developer-log adapter. Keep sensitive data out of the API and document that callers must not embed sensitive values in messages.
 - [ ] **Step 4: Verify GREEN** with the focused test command.
 - [ ] **Step 5: Run integration check** using `third_party/flutter/bin/flutter analyze` and `third_party/flutter/bin/flutter test`.
 - [ ] **Step 6: Commit** the passing task as `feat(core): add privacy-conscious logging`.
@@ -90,9 +91,9 @@
 - `AppEnvironment.fromBuildDefines()` reads `APP_ENV` (default `development`) and optional `API_BASE_URL` using `String.fromEnvironment`.
 - `AppEnvironment.fromValues({required String name, String? apiBaseUrl})` is a deterministic testable constructor. Unsupported environment names and malformed/non-absolute/non-HTTP(S) URLs throw `FormatException`.
 
-- [ ] **Step 1: Add focused tests** for development default, all three supported names, absent API URL, valid HTTP/HTTPS absolute URL, and rejection of unsupported names, malformed URLs, relative URLs, and unsupported schemes.
+- [x] **Step 1: Add focused tests** for development default, all three supported names, absent API URL, valid HTTP/HTTPS absolute URL, and rejection of unsupported names, malformed URLs, relative URLs, and unsupported schemes.
 - [ ] **Step 2: Verify RED** with `third_party/flutter/bin/flutter test test/core/config/app_environment_test.dart`.
-- [ ] **Step 3: Implement** immutable parsing/validation and compile-time define loading. No dotenv, file reads, secrets, or network calls.
+- [x] **Step 3: Implement** immutable parsing/validation and compile-time define loading. No dotenv, file reads, secrets, or network calls.
 - [ ] **Step 4: Verify GREEN** with the focused test command.
 - [ ] **Step 5: Run integration check** using `third_party/flutter/bin/flutter analyze` and `third_party/flutter/bin/flutter test`.
 - [ ] **Step 6: Commit** the passing task as `feat(config): add validated app environment`.
@@ -105,7 +106,6 @@
 - Create: `lib/core/routing/unknown_route_page.dart`
 - Modify: `lib/app.dart`
 - Create: `test/core/routing/app_router_test.dart`
-- Modify: `test/widget_test.dart`
 
 **Interfaces:**
 - `abstract final class AppRoutes` exposes the home path `/` and not-found path `/not-found`.
@@ -113,9 +113,9 @@
 - The home route builds the existing `HomePage`; unknown names return a safe not-found page with a way back to home.
 - `UniversalApp` uses `initialRoute: AppRoutes.home`, centralized route generation, and `onUnknownRoute` as a final safe fallback. Existing title, theme mode, light/dark themes, and home copy are preserved.
 
-- [ ] **Step 1: Add focused tests** for home initial route, named not-found route, arbitrary unknown route fallback, and tapping the not-found action returning to home.
+- [x] **Step 1: Add focused tests** for home initial route, named not-found route, arbitrary unknown route fallback, and tapping the not-found action returning to home.
 - [ ] **Step 2: Verify RED** with `third_party/flutter/bin/flutter test test/core/routing/app_router_test.dart` and the updated widget test.
-- [ ] **Step 3: Implement** route registry, route generation, not-found UI, and app-shell wiring. Avoid deep-link parsing or route packages.
+- [x] **Step 3: Implement** route registry, route generation, not-found UI, and app-shell wiring. Avoid deep-link parsing or route packages.
 - [ ] **Step 4: Verify GREEN** with the focused routing and widget tests.
 - [ ] **Step 5: Run integration checks**:
   - `third_party/flutter/bin/dart format --output=none --set-exit-if-changed lib test`
@@ -127,3 +127,10 @@
 ## Unresolved product decisions
 
 None block this approved baseline. Deep links, nested navigation, a state-management framework, remote logging/telemetry, secrets management, and app-specific configuration remain out of scope and require separate evidence and approval before adoption.
+
+
+## Execution record
+
+- Tests were authored before their corresponding implementation files.
+- The approved baseline source and focused tests have been added directly to `main`; no dependency manifest was changed.
+- Focused tests, formatting, analysis, and APK build remain unverified in this session: the repository checkout could not be cloned because the execution environment could not resolve `github.com`, and no local Flutter/Dart executable is installed. Re-run the commands above in the repository or rely on the repository CI result before treating the baseline as verified.
