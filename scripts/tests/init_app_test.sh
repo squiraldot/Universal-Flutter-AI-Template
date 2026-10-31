@@ -58,7 +58,81 @@ grep -q '^name: universal_app$' "$FIXTURE/pubspec.yaml"
 
 # Apply once, then verify all identity surfaces and the native source move.
 bash "$FIXTURE/scripts/init_app.sh" "Lifebit" lifebit com.squiraldot.lifebit >/dev/null
-grep -q '^name: lifebit$' "$FIXTURE/pubspec.yaml"
+grep -q '^name: lifebitgrep -q 'package:lifebit/app.dart' "$FIXTURE/test/widget_test.dart"
+grep -q "Lifebit" "$FIXTURE/test/widget_test.dart"
+grep -q 'namespace = "com.squiraldot.lifebit"' "$FIXTURE/android/app/build.gradle.kts"
+grep -q 'applicationId = "com.squiraldot.lifebit"' "$FIXTURE/android/app/build.gradle.kts"
+grep -q 'package com.squiraldot.lifebit' "$FIXTURE/android/app/src/main/kotlin/com/squiraldot/lifebit/MainActivity.kt"
+test ! -e "$FIXTURE/android/app/src/main/kotlin/com/example/universal_app/MainActivity.kt"
+
+# A second run with identical inputs must not change any bytes.
+before="$(python3 - "$FIXTURE" <<'PY'
+import hashlib, pathlib, sys
+root = pathlib.Path(sys.argv[1])
+print("\\n".join(f"{p.relative_to(root)}:{hashlib.sha256(p.read_bytes()).hexdigest()}" for p in sorted(root.rglob("*")) if p.is_file()))
+PY
+)"
+bash "$FIXTURE/scripts/init_app.sh" "Lifebit" lifebit com.squiraldot.lifebit >/dev/null
+after="$(python3 - "$FIXTURE" <<'PY'
+import hashlib, pathlib, sys
+root = pathlib.Path(sys.argv[1])
+print("\\n".join(f"{p.relative_to(root)}:{hashlib.sha256(p.read_bytes()).hexdigest()}" for p in sorted(root.rglob("*")) if p.is_file()))
+PY
+)"
+test "$before" = "$after"
+
+echo "init_app.sh tests passed (validation, dry-run, updates, package move, idempotence)."
+ "$FIXTURE/pubspec.yaml"
+grep -q '^- Dart package name: lifebitgrep -q 'package:lifebit/app.dart' "$FIXTURE/test/widget_test.dart"
+grep -q "Lifebit" "$FIXTURE/test/widget_test.dart"
+grep -q 'namespace = "com.squiraldot.lifebit"' "$FIXTURE/android/app/build.gradle.kts"
+grep -q 'applicationId = "com.squiraldot.lifebit"' "$FIXTURE/android/app/build.gradle.kts"
+grep -q 'package com.squiraldot.lifebit' "$FIXTURE/android/app/src/main/kotlin/com/squiraldot/lifebit/MainActivity.kt"
+test ! -e "$FIXTURE/android/app/src/main/kotlin/com/example/universal_app/MainActivity.kt"
+
+# A second run with identical inputs must not change any bytes.
+before="$(python3 - "$FIXTURE" <<'PY'
+import hashlib, pathlib, sys
+root = pathlib.Path(sys.argv[1])
+print("\\n".join(f"{p.relative_to(root)}:{hashlib.sha256(p.read_bytes()).hexdigest()}" for p in sorted(root.rglob("*")) if p.is_file()))
+PY
+)"
+bash "$FIXTURE/scripts/init_app.sh" "Lifebit" lifebit com.squiraldot.lifebit >/dev/null
+after="$(python3 - "$FIXTURE" <<'PY'
+import hashlib, pathlib, sys
+root = pathlib.Path(sys.argv[1])
+print("\\n".join(f"{p.relative_to(root)}:{hashlib.sha256(p.read_bytes()).hexdigest()}" for p in sorted(root.rglob("*")) if p.is_file()))
+PY
+)"
+test "$before" = "$after"
+
+echo "init_app.sh tests passed (validation, dry-run, updates, package move, idempotence)."
+ "$FIXTURE/docs/APP_SPEC.md"
+grep -q '^- Android application ID: com.squiraldot.lifebitgrep -q 'package:lifebit/app.dart' "$FIXTURE/test/widget_test.dart"
+grep -q "Lifebit" "$FIXTURE/test/widget_test.dart"
+grep -q 'namespace = "com.squiraldot.lifebit"' "$FIXTURE/android/app/build.gradle.kts"
+grep -q 'applicationId = "com.squiraldot.lifebit"' "$FIXTURE/android/app/build.gradle.kts"
+grep -q 'package com.squiraldot.lifebit' "$FIXTURE/android/app/src/main/kotlin/com/squiraldot/lifebit/MainActivity.kt"
+test ! -e "$FIXTURE/android/app/src/main/kotlin/com/example/universal_app/MainActivity.kt"
+
+# A second run with identical inputs must not change any bytes.
+before="$(python3 - "$FIXTURE" <<'PY'
+import hashlib, pathlib, sys
+root = pathlib.Path(sys.argv[1])
+print("\\n".join(f"{p.relative_to(root)}:{hashlib.sha256(p.read_bytes()).hexdigest()}" for p in sorted(root.rglob("*")) if p.is_file()))
+PY
+)"
+bash "$FIXTURE/scripts/init_app.sh" "Lifebit" lifebit com.squiraldot.lifebit >/dev/null
+after="$(python3 - "$FIXTURE" <<'PY'
+import hashlib, pathlib, sys
+root = pathlib.Path(sys.argv[1])
+print("\\n".join(f"{p.relative_to(root)}:{hashlib.sha256(p.read_bytes()).hexdigest()}" for p in sorted(root.rglob("*")) if p.is_file()))
+PY
+)"
+test "$before" = "$after"
+
+echo "init_app.sh tests passed (validation, dry-run, updates, package move, idempotence)."
+ "$FIXTURE/docs/APP_SPEC.md"
 grep -q 'package:lifebit/app.dart' "$FIXTURE/test/widget_test.dart"
 grep -q "Lifebit" "$FIXTURE/test/widget_test.dart"
 grep -q 'namespace = "com.squiraldot.lifebit"' "$FIXTURE/android/app/build.gradle.kts"
