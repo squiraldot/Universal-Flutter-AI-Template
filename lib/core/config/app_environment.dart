@@ -1,10 +1,7 @@
 enum AppEnvironmentName { development, staging, production }
 
 final class AppEnvironment {
-  const AppEnvironment._({
-    required this.name,
-    required this.apiBaseUrl,
-  });
+  const AppEnvironment._({required this.name, required this.apiBaseUrl});
 
   factory AppEnvironment.fromBuildDefines() {
     const environmentName = String.fromEnvironment(
@@ -32,10 +29,7 @@ final class AppEnvironment {
 
     final parsedApiBaseUrl = _parseApiBaseUrl(apiBaseUrl);
 
-    return AppEnvironment._(
-      name: parsedName,
-      apiBaseUrl: parsedApiBaseUrl,
-    );
+    return AppEnvironment._(name: parsedName, apiBaseUrl: parsedApiBaseUrl);
   }
 
   final AppEnvironmentName name;
