@@ -19,7 +19,7 @@ third_party/flutter/bin/flutter gen-l10n
 Run the repository checks:
 
 ```bash
-bash -n scripts/bootstrap.sh scripts/init_app.sh scripts/tests/init_app_test.sh
+bash -n scripts/bootstrap.sh scripts/init_app.sh scripts/check_coverage.sh scripts/tests/init_app_test.sh scripts/tests/check_coverage_test.sh
 bash scripts/tests/init_app_test.sh
 bash scripts/tests/check_coverage_test.sh
 third_party/flutter/bin/dart format --output=none --set-exit-if-changed lib test
