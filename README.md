@@ -51,8 +51,8 @@ Flutter Web is intended for app-style experiences. It is not a replacement for a
 - **Navigation:** go_router with centralized route definitions and Web URL support.
 - **UI system:** Material 3 themes plus shared spacing, radius and motion tokens.
 - **Localization:** Flutter `gen_l10n` with ARB resources. Generate before analysis with `flutter gen-l10n`.
-- **Error reporting:** local Flutter framework/platform error forwarding through the injectable logger; no remote telemetry SDK is enabled by default.
-- **Sample feature:** a small task checklist demonstrates repository injection, loading/empty/error/retry states and state updates.
+- **Error reporting:** local Flutter framework/platform error forwarding through the injectable logger; raw exception payloads are not sent to logs and no remote telemetry SDK is enabled by default.
+- **Sample feature:** a small task checklist at `/sample-tasks` demonstrates repository injection, loading/empty/error/retry states and state updates.
 
 ## Run with an environment
 
