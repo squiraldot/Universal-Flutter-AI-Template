@@ -1,24 +1,31 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../features/home/presentation/home_page.dart';
+import '../../features/sample_tasks/presentation/sample_tasks_page.dart';
 import 'app_routes.dart';
 import 'unknown_route_page.dart';
 
-abstract final class AppRouter {
-  static Route<dynamic> onGenerateRoute(RouteSettings settings) {
-    final Widget page = switch (settings.name) {
-      AppRoutes.home => const HomePage(),
-      AppRoutes.notFound => const UnknownRoutePage(),
-      _ => UnknownRoutePage(routeName: settings.name),
-    };
+final appRouterProvider = Provider<GoRouter>((ref) {
+  final router = createAppRouter();
+  ref.onDispose(router.dispose);
+  return router;
+});
 
-    return MaterialPageRoute<void>(builder: (_) => page, settings: settings);
-  }
-
-  static Route<dynamic> onUnknownRoute(RouteSettings settings) {
-    return MaterialPageRoute<void>(
-      builder: (_) => UnknownRoutePage(routeName: settings.name),
-      settings: settings,
-    );
-  }
+GoRouter createAppRouter({String initialLocation = AppRoutes.home}) {
+  return GoRouter(
+    initialLocation: initialLocation,
+    routes: [
+      GoRoute(
+        path: AppRoutes.home,
+        builder: (context, state) => const HomePage(),
+      ),
+      GoRoute(
+        path: AppRoutes.sampleTasks,
+        builder: (context, state) => const SampleTasksPage(),
+      ),
+    ],
+    errorBuilder: (context, state) =>
+        UnknownRoutePage(routeName: state.uri.toString()),
+  );
 }

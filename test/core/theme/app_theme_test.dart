@@ -30,14 +30,17 @@ void main() {
     });
   });
 
-  test('spacing and radius tokens expose the agreed scale', () {
+  test('spacing, radius and motion tokens expose the shared scales', () {
     expect(AppSpacing.xs, 4);
     expect(AppSpacing.sm, 8);
     expect(AppSpacing.md, 16);
-    expect(AppSpacing.xl, 32);
     expect(AppSpacing.lg, 24);
+    expect(AppSpacing.xl, 32);
     expect(AppRadii.sm, 8);
     expect(AppRadii.md, 12);
     expect(AppRadii.lg, 16);
+    expect(AppMotion.fast, const Duration(milliseconds: 150));
+    expect(AppMotion.normal, const Duration(milliseconds: 250));
+    expect(AppMotion.slow, const Duration(milliseconds: 350));
   });
 }

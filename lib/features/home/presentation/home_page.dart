@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/routing/app_routes.dart';
 import '../../../core/theme/app_tokens.dart';
-import 'home_content.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final content = HomeContent.starter;
-    final displayLines = content.displayLines;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Universal App')),
@@ -26,12 +27,18 @@ class HomePage extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
-                displayLines[0],
+                l10n.homeHeadline,
                 style: Theme.of(context).textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.sm),
-              Text(displayLines[1], textAlign: TextAlign.center),
+              Text(l10n.homeDescription, textAlign: TextAlign.center),
+              const SizedBox(height: AppSpacing.lg),
+              FilledButton.icon(
+                onPressed: () => context.go(AppRoutes.sampleTasks),
+                icon: const Icon(Icons.checklist),
+                label: Text(l10n.openSampleTasks),
+              ),
             ],
           ),
         ),

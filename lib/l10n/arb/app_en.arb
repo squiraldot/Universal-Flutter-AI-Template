@@ -1,0 +1,16 @@
+{
+  "@@locale": "en",
+  "homeHeadline": "Your reusable Flutter app foundation is ready.",
+  "homeDescription": "Start building with reusable architecture, shared UI components, testing, and automated build workflows.",
+  "openSampleTasks": "Open sample tasks",
+  "sampleTasksTitle": "Sample tasks",
+  "taskArchitecture": "Review the app architecture",
+  "taskFeature": "Add your first feature",
+  "noTasks": "No sample tasks yet.",
+  "tasksLoadError": "We couldn't load sample tasks. Please try again.",
+  "retry": "Try again",
+  "loadingTasks": "Loading sample tasks",
+  "pageNotFound": "Page not found",
+  "requestedPageUnavailable": "The requested page is unavailable.",
+  "goHome": "Go home"
+}

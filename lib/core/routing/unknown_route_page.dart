@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../l10n/generated/app_localizations.dart';
 import 'app_routes.dart';
 
 class UnknownRoutePage extends StatelessWidget {
@@ -9,6 +11,8 @@ class UnknownRoutePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Universal App')),
       body: Center(
@@ -18,25 +22,21 @@ class UnknownRoutePage extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Page not found',
+                l10n.pageNotFound,
                 style: Theme.of(context).textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
               if (routeName != null) ...[
                 const SizedBox(height: 8),
                 Text(
-                  'The requested page is unavailable.',
+                  l10n.requestedPageUnavailable,
                   textAlign: TextAlign.center,
                 ),
               ],
               const SizedBox(height: 16),
               FilledButton(
-                onPressed: () {
-                  Navigator.of(
-                    context,
-                  ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
-                },
-                child: const Text('Go home'),
+                onPressed: () => context.go(AppRoutes.home),
+                child: Text(l10n.goHome),
               ),
             ],
           ),
