@@ -3,7 +3,8 @@ class HomeContent {
 
   static const starter = HomeContent(
     headline: 'Your reusable Flutter app foundation is ready.',
-    description: 'Start building with reusable architecture, shared UI '
+    description:
+        'Start building with reusable architecture, shared UI '
         'components, testing, and automated build workflows.',
   );
 

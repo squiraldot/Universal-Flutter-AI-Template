@@ -31,10 +31,7 @@ class HomePage extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.sm),
-              Text(
-                displayLines[1],
-                textAlign: TextAlign.center,
-              ),
+              Text(displayLines[1], textAlign: TextAlign.center),
             ],
           ),
         ),

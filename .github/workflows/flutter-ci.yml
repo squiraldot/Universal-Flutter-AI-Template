@@ -57,7 +57,7 @@ jobs:
         run: bash scripts/tests/init_app_test.sh
 
       - name: Show canonical Dart formatting for remaining files
-        run: dart format --output=show lib/core/routing/unknown_route_page.dart test/core/config/app_environment_test.dart lib/features/home/presentation/home_content.dart lib/features/home/presentation/home_page.dart
+        run: dart format --output=show lib/core/routing/unknown_route_page.dart test/core/config/app_environment_test.dart
 
       - name: Check Dart formatting
         run: dart format --output=none --set-exit-if-changed lib test
