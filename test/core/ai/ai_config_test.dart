@@ -42,5 +42,40 @@ void main() {
         throwsArgumentError,
       );
     });
+
+    test('accepts bounded retry configuration', () {
+      final config = AiConfig(
+        baseUrl: Uri.parse('https://example.com/v1'),
+        model: 'demo-model',
+        maxRetries: 3,
+        retryBaseDelay: const Duration(milliseconds: 100),
+        maxRetryDelay: const Duration(seconds: 1),
+      );
+
+      expect(config.maxRetries, 3);
+    });
+
+    test('rejects retry counts above the hard limit', () {
+      expect(
+        () => AiConfig(
+          baseUrl: Uri.parse('https://example.com/v1'),
+          model: 'demo-model',
+          maxRetries: 6,
+        ),
+        throwsArgumentError,
+      );
+    });
+
+    test('rejects an invalid retry delay range', () {
+      expect(
+        () => AiConfig(
+          baseUrl: Uri.parse('https://example.com/v1'),
+          model: 'demo-model',
+          retryBaseDelay: const Duration(seconds: 2),
+          maxRetryDelay: const Duration(seconds: 1),
+        ),
+        throwsArgumentError,
+      );
+    });
   });
 }
