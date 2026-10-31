@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'ai_exception.dart';
+
 /// Cooperative cancellation signal shared by an AI operation and its caller.
 class AiCancellationToken {
   final Completer<void> _completer = Completer<void>();
@@ -17,17 +19,7 @@ class AiCancellationToken {
 
   void throwIfCancelled() {
     if (isCancelled) {
-      throw AiExceptionBridge.cancelled();
+      throw AiException.cancelled();
     }
   }
-}
-
-/// Keeps the cancellation primitive independent of the exception library's
-/// implementation details while providing a single public cancellation API.
-abstract final class AiExceptionBridge {
-  static Exception cancelled() => const _AiOperationCancelled();
-}
-
-class _AiOperationCancelled implements Exception {
-  const _AiOperationCancelled();
 }
