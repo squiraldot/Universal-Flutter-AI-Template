@@ -1,5 +1,8 @@
 # Universal Flutter AI App Template
 
+> [!CAUTION]
+> This Repository Understand Development please don't use for production
+
 A reusable foundation for building Android, iOS and Web apps with Flutter, with optional AI integration modules.
 
 ## Why this exists
