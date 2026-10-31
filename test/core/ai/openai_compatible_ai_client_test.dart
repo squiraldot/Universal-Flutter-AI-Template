@@ -299,28 +299,29 @@ void main() {
     );
     client.close();
   });
-  test('cancelling a stream subscription aborts its operation', () async {
-    final cancellation = AiCancellationToken();
+  test('cancelling a stream subscription aborts its HTTP request', () async {
+    final firstChunk = Completer<String>();
+    Future<void>? abortTrigger;
     final client = OpenAiCompatibleAiClient(
       config: config(),
       tokenProvider: () async => 'token',
-      httpClient: MockClient(
-        (_) async => http.Response(
+      httpClient: MockClient((request) async {
+        expect(request, isA<http.AbortableRequest>());
+        abortTrigger = (request as http.AbortableRequest).abortTrigger;
+        return http.Response(
           'data: {"choices":[{"delta":{"content":"first"}}]}\\n\\n'
           'data: {"choices":[{"delta":{"content":"second"}}]}\\n\\n',
           200,
-        ),
-      ),
+        );
+      }),
     );
 
-    expect(
-      await client.stream(
-        'Hello',
-        cancellationToken: cancellation,
-      ).first,
-      'first',
-    );
-    expect(cancellation.isCancelled, isTrue);
+    final subscription = client.stream('Hello').listen(firstChunk.complete);
+    expect(await firstChunk.future, 'first');
+    await subscription.cancel();
+
+    expect(abortTrigger, isNotNull);
+    await expectLater(abortTrigger!, completes);
     client.close();
   });
 
