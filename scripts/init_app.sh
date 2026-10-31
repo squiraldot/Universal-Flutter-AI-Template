@@ -19,9 +19,13 @@ export INIT_APP_ROOT="$ROOT_DIR" INIT_APP_NAME="$APP_NAME" INIT_DART_PACKAGE="$D
 python3 <<'PY'
 import os, re, sys, tempfile
 from pathlib import Path
+from xml.sax.saxutils import escape as xml_escape
 root = Path(os.environ["INIT_APP_ROOT"])
 app, package, app_id = (os.environ[k] for k in ("INIT_APP_NAME","INIT_DART_PACKAGE","INIT_ANDROID_ID"))
 dry = os.environ["INIT_DRY_RUN"] == "true"
+if any(ord(ch) < 32 or ord(ch) == 127 for ch in app): raise ValueError("App name cannot contain control characters.")
+dart_app = app.replace("\\", "\\\\").replace("'", "\\'").replace("$", "\\$")
+xml_app = xml_escape(app, {'"': "&quot;"})
 pubspec=root/"pubspec.yaml"; spec_file=root/"docs/APP_SPEC.md"
 manifest=root/"android/app/src/main/AndroidManifest.xml"
 android=root/"android/app"; tests=root/"test"
@@ -49,7 +53,7 @@ if re.search(r"(?m)^- Dart package name:",spec):
 else: spec=spec.replace(f"- App name: {app}\n",f"- App name: {app}\n- Dart package name: {package}\n",1)
 changes[spec_file]=once(spec,r"(?m)^- Android application ID:\s*.*$",f"- Android application ID: {app_id}","APP_SPEC Android ID")
 for p in sorted([*(root/"lib").rglob("*.dart"),*tests.rglob("*.dart")]):
- s=read(p); updated=s.replace("Universal App",app).replace(f"package:{old_package}/",f"package:{package}/")
+ s=read(p); updated=s.replace("Universal App",dart_app).replace(f"package:{old_package}/",f"package:{package}/")
  if updated!=s: changes[p]=updated
 gradle=gradles[0]; gs=read(gradle)
 for key in ("namespace","applicationId"):
@@ -63,8 +67,8 @@ if value.startswith("@string/"):
  sf=android/"src/main/res/values/strings.xml"
  if not sf.is_file(): raise ValueError("Android app-name strings.xml is missing.")
  key=re.escape(value.split("/",1)[1])
- changes[sf]=once(read(sf),rf'(?s)(<string\s+name="{key}"\s*>).*?(</string>)',lambda m:f"{m.group(1)}{app}{m.group(2)}","Android app-name string")
-else: changes[manifest]=ms.replace(f'android:label="{value}"',f'android:label="{app}"',1)
+ changes[sf]=once(read(sf),rf'(?s)(<string\s+name="{key}"\s*>).*?(</string>)',lambda m:f"{m.group(1)}{xml_app}{m.group(2)}","Android app-name string")
+else: changes[manifest]=ms.replace(f'android:label="{value}"',f'android:label="{xml_app}"',1)
 activities=[p for p in (android/"src/main").rglob("*") if p.is_file() and p.name in ("MainActivity.kt","MainActivity.java")]
 if len(activities)!=1: raise ValueError(f"Expected one MainActivity.kt/.java; found {len(activities)}.")
 activity=activities[0]
