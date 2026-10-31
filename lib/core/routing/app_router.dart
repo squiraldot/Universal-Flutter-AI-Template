@@ -12,10 +12,7 @@ abstract final class AppRouter {
       _ => UnknownRoutePage(routeName: settings.name),
     };
 
-    return MaterialPageRoute<void>(
-      builder: (_) => page,
-      settings: settings,
-    );
+    return MaterialPageRoute<void>(builder: (_) => page, settings: settings);
   }
 
   static Route<dynamic> onUnknownRoute(RouteSettings settings) {
