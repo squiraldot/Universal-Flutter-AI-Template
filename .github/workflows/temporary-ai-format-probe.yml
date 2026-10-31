@@ -1,0 +1,28 @@
+name: Temporary AI Dart Format Probe
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lib/core/ai/**'
+      - 'test/core/ai/**'
+      - 'test/support/mock_ai_client.dart'
+      - '.github/workflows/temporary-ai-format-probe.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  format-probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
+        with:
+          flutter-version: '3.47.8'
+          channel: stable
+          cache: true
+      - name: Format AI files and print exact patch
+        run: |
+          dart format lib/core/ai/ai_config.dart lib/core/ai/openai_compatible_ai_client.dart test/core/ai/mock_ai_client_test.dart test/core/ai/openai_compatible_ai_client_test.dart test/support/mock_ai_client.dart
+          git diff --no-ext-diff --unified=3 -- lib/core/ai/ai_config.dart lib/core/ai/openai_compatible_ai_client.dart test/core/ai/mock_ai_client_test.dart test/core/ai/openai_compatible_ai_client_test.dart test/support/mock_ai_client.dart
