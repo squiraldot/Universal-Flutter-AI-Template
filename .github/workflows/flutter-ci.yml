@@ -78,8 +78,31 @@ jobs:
           COVERAGE_THRESHOLD: '80'
         run: bash scripts/check_coverage.sh
 
+      - name: Install matching ChromeDriver
+        run: |
+          chrome_version="$(google-chrome --version | grep -oE '[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+')"
+          npx --yes @puppeteer/browsers install "chromedriver@$chrome_version" --path "$RUNNER_TEMP/chromedriver"
+          chromedriver_path="$(find "$RUNNER_TEMP/chromedriver" -type f -name chromedriver -perm -u+x | head -n 1)"
+          if [[ -z "$chromedriver_path" ]]; then
+            echo "ChromeDriver installation did not produce an executable." >&2
+            exit 1
+          fi
+          echo "$(dirname "$chromedriver_path")" >> "$GITHUB_PATH"
+
       - name: Run integration smoke test on Chrome
-        run: flutter test integration_test -d chrome
+        run: |
+          chromedriver --port=4444 > "$RUNNER_TEMP/chromedriver.log" 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4444/status >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          if ! curl --fail --silent http://127.0.0.1:4444/status >/dev/null; then
+            cat "$RUNNER_TEMP/chromedriver.log"
+            exit 1
+          fi
+          flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_smoke_test.dart -d web-server --browser-name=chrome --web-port=7357
 
       - name: Build debug APK
         run: flutter build apk --debug --dart-define-from-file=config/development.json
