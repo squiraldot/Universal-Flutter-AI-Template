@@ -65,8 +65,11 @@ jobs:
       - name: Analyze Dart code
         run: flutter analyze
 
-      - name: Run Flutter tests
-        run: flutter test
+      - name: Run Flutter tests with coverage
+        run: flutter test --coverage
+
+      - name: Enforce minimum Dart line coverage
+        run: bash scripts/check_coverage.sh
 
       - name: Build debug APK
         run: flutter build apk --debug

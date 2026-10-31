@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_tokens.dart';
+import 'home_content.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final content = HomeContent.starter;
+    final displayLines = content.displayLines;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Universal App')),
       body: Center(
@@ -22,14 +26,13 @@ class HomePage extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
-                'Your reusable Flutter app foundation is ready.',
+                displayLines[0],
                 style: Theme.of(context).textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.sm),
-              const Text(
-                'Start building with reusable architecture, shared UI '
-                'components, testing, and automated build workflows.',
+              Text(
+                displayLines[1],
                 textAlign: TextAlign.center,
               ),
             ],

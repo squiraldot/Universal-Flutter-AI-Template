@@ -97,7 +97,8 @@ bash scripts/init_app.sh --dry-run "My App" my_app com.example.my_app
 bash scripts/init_app.sh "My App" my_app com.example.my_app
 third_party/flutter/bin/dart format lib test
 third_party/flutter/bin/flutter analyze
-third_party/flutter/bin/flutter test
+third_party/flutter/bin/flutter test --coverage
+bash scripts/check_coverage.sh
 third_party/flutter/bin/flutter build apk --debug
 ```
 

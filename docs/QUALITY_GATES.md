@@ -3,7 +3,8 @@
 ## Every code change
 - Matches approved requirements and existing conventions.
 - Formatting passes; no new analyzer errors.
-- Relevant tests pass.
+- Relevant unit, widget and golden tests pass.
+- Flutter CI enforces at least 80% Dart line coverage for library files represented in LCOV.
 - No secrets or sensitive logs introduced.
 - Diff reviewed; docs updated when needed.
 
