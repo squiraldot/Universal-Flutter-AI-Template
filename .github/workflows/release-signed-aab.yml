@@ -64,7 +64,7 @@ jobs:
           BUILD_NAME: ${{ inputs.build_name }}
           BUILD_NUMBER: ${{ inputs.build_number }}
         run: |
-          flutter build appbundle --release --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER"
+          flutter build appbundle --release --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER" --dart-define-from-file=config/production.json
 
       - name: Sign app bundle with repository secrets
         env:

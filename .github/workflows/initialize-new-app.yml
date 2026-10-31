@@ -118,11 +118,11 @@ jobs:
 
       - name: Build debug APK
         if: ${{ !inputs.dry_run }}
-        run: flutter build apk --debug
+        run: flutter build apk --debug --dart-define-from-file=config/development.json
 
       - name: Build Web release bundle
         if: ${{ !inputs.dry_run }}
-        run: flutter build web --release
+        run: flutter build web --release --dart-define-from-file=config/production.json
 
       - name: Package initialized source
         id: package-source
