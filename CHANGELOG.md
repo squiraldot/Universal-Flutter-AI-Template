@@ -39,7 +39,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   JAR signature, and uploads the signed AAB as an artifact.
 - Manual initialize-new-app workflow can preview or apply app identity changes,
   run initializer and Flutter checks, and upload source and debug APK artifacts.
-- Dependabot is configured for weekly GitHub Actions and Pub dependency
-  updates, with grouped update definitions.
+- Dependabot defines weekly GitHub Actions and Pub update schedules with
+  grouped ecosystems; zero-open-PR limits currently prevent version-update PRs.
 - Flutter SDK and Android build tooling are pinned/configured for reproducible
   CI and release workflows.
