@@ -66,7 +66,7 @@ bash scripts/init_app.sh --dry-run "Lifebit" lifebit com.squiraldot.lifebit
 
 The script updates `pubspec.yaml`, Dart package imports, starter app titles and widget-test expectations, `docs/APP_SPEC.md`, Android Gradle namespace/application ID, launcher label, and the `MainActivity` package/path. It validates expected files and patterns before writing, refuses ambiguous Android configurations, and is safe to rerun with the same values. It does not run `flutter pub get`; run that after initialization to refresh the lockfile.
 
-The Android scaffold must exist first. Changing an application ID later may also require separate updates to store listings, signing/release configuration and external service registrations.
+Run the script's fixture-based safety checks with `bash scripts/tests/init_app_test.sh`. They cover invalid input, dry-run immutability, identity updates, MainActivity relocation and repeat-run idempotence.\n\nThe Android scaffold must exist first. Changing an application ID later may also require separate updates to store listings, signing/release configuration and external service registrations.
 
 ## Commands
 
