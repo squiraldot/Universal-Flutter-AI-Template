@@ -32,10 +32,9 @@ class UnknownRoutePage extends StatelessWidget {
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: () {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    AppRoutes.home,
-                    (route) => false,
-                  );
+                  Navigator.of(
+                    context,
+                  ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
                 },
                 child: const Text('Go home'),
               ),
