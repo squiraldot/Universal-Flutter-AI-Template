@@ -12,9 +12,6 @@ void main() {
       find.text('Your reusable Flutter app foundation is ready.'),
       findsOneWidget,
     );
-    expect(
-      find.textContaining('reusable architecture'),
-      findsOneWidget,
-    );
+    expect(find.textContaining('reusable architecture'), findsOneWidget);
   });
 }
