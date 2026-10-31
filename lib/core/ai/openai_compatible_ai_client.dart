@@ -172,7 +172,9 @@ class OpenAiCompatibleAiClient implements AiClient {
     for (var attempt = 0; ; attempt++) {
       cancellation.throwIfCancelled();
       final attemptCancellation = AiCancellationToken();
-      cancellation.whenCancelled.then((_) => attemptCancellation.cancel());
+      unawaited(
+        cancellation.whenCancelled.then((_) => attemptCancellation.cancel()),
+      );
       try {
         final request =
             http.AbortableRequest(
