@@ -58,7 +58,10 @@ grep -q '^name: universal_app$' "$FIXTURE/pubspec.yaml"
 
 # Apply once, then verify all identity surfaces and the native source move.
 bash "$FIXTURE/scripts/init_app.sh" "Lifebit" lifebit com.squiraldot.lifebit >/dev/null
-grep -q '^name: lifebitgrep -q 'package:lifebit/app.dart' "$FIXTURE/test/widget_test.dart"
+grep -q '^name: lifebit$' "$FIXTURE/pubspec.yaml"
+grep -q '^- Dart package name: lifebit$' "$FIXTURE/docs/APP_SPEC.md"
+grep -q '^- Android application ID: com.squiraldot.lifebit$' "$FIXTURE/docs/APP_SPEC.md"
+grep -q 'package:lifebit/app.dart' "$FIXTURE/test/widget_test.dart"
 grep -q "Lifebit" "$FIXTURE/test/widget_test.dart"
 grep -q 'namespace = "com.squiraldot.lifebit"' "$FIXTURE/android/app/build.gradle.kts"
 grep -q 'applicationId = "com.squiraldot.lifebit"' "$FIXTURE/android/app/build.gradle.kts"
