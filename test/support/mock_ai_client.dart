@@ -27,7 +27,7 @@ class MockAiClient implements AiClient {
   Future<String> complete(
     String prompt, {
     AiCancellationToken? cancellationToken,
-  }) {
+  }) async {
     cancellationToken?.throwIfCancelled();
     prompts.add(prompt);
     return _onComplete(prompt);
