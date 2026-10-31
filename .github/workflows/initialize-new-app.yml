@@ -105,12 +105,7 @@ jobs:
         if: ${{ !inputs.dry_run }}
         run: |
           archive_path="$RUNNER_TEMP/initialized-app-source.tar.gz"
-          tar -czf "$archive_path" \\
-            --exclude=.git \\
-            --exclude=.dart_tool \\
-            --exclude=build \\
-            --exclude=third_party/flutter \\
-            -C "$GITHUB_WORKSPACE" .
+          tar -czf "$archive_path" --exclude=.git --exclude=.dart_tool --exclude=build --exclude=third_party/flutter -C "$GITHUB_WORKSPACE" .
           echo "archive_path=$archive_path" >> "$GITHUB_OUTPUT"
 
       - name: Upload initialization preview
