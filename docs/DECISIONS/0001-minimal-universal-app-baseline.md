@@ -1,6 +1,6 @@
 # ADR 0001: Minimal Universal App Baseline
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-10-31
 - **Branch:** `main`
 - **Scope:** Shared application foundation only; no product-specific features.
